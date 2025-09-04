@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>NutriLife</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Обновленные стили с улучшенным дизайном */
+        :root {
+            --primary: #007AFF;
+            --primary-dark: #0051a8;
+            --primary-light: rgba(0, 122, 255, 0.1);
+            --secondary: #5856D6;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+            --background: #F2F2F7;
+            --card-background: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --border-radius: 16px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            max-width: 100vw;
+            overflow-x: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Улучшенная навигация */
+        .nav-tabs {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+        }
+
+        .nav-tab i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 4px;
+            transition: var(--transition);
+        }
+
+        .nav-tab.active i {
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* Страницы */
+        .page {
+            display: none;
+            padding: 16px;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Улучшенный заголовок */
+        .header {
+            padding: 20px 16px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            z-index: 100;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 32px;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Улучшенные карточки */
+        .card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Кольцо прогресса */
+        .progress-ring {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
+        }
+
+        .ring-bg {
+            fill: none;
+            stroke: #f0f0f5;
+            stroke-width: 10;
+        }
+
+        .ring-progress {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-calories {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .progress-goal {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Полосы макронутриентов */
+        .macro-bar {
+            height: 8px;
+            background: #f0f0f5;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .macro-progress {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+            position: relative;
+        }
+
+        .macro-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        .protein { background: linear-gradient(90deg, #FF9500, #FFCC00); }
+        .carbs { background: linear-gradient(90deg, #34C759, #5AD427); }
+        .fat { background: linear-gradient(90deg, #007AFF, #5856D6); }
+
+        /* Формы и кнопки */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            font-size: 18px;
+            padding: 16px 18px;
+            border: 1.5px solid #e5e5ea;
+            border-radius: 12px;
+            background: #ffffff;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #f9f9ff;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 18px 24px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.2), transparent);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover::after {
+            transform: translateY(0);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e5e5ea;
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, var(--success), #2AA84B);
+            margin-top: 10px;
+        }
+
+        /* Списки */
+        .food-list {
+            list-style: none;
+        }
+
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid #f1f1f2;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .food-item:active {
+            background-color: #f9f9ff;
+        }
+
+        .food-item:last-child {
+            border-bottom: none;
+        }
+
+        .food-name {
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .food-details {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-top: 4px;
+        }
+
+        .food-calories {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 17px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 50px 20px;
+            font-style: italic;
+            font-size: 17px;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow: auto;
+            padding: 28px;
+            animation: fadeIn 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:active {
+            background-color: #f0f0f5;
+        }
+
+        /* Чекбоксы и радиокнопки в стиле iOS */
+        .checkbox-group, .radio-group {
+            margin-bottom: 20px;
+        }
+
+        .checkbox-label, .radio-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .checkbox-input, .radio-input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .checkbox-design, .radio-design {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #c5c5c7;
+            border-radius: 6px;
+            margin-right: 12px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .radio-design {
+            border-radius: 50%;
+        }
+
+        .checkbox-input:checked ~ .checkbox-design,
+        .radio-input:checked ~ .radio-design {
+            border-color: var(--primary);
+            background-color: var(--primary);
+        }
+
+        .checkbox-input:checked ~ .checkbox-design::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) translate(-1px, -1px);
+            left: 7px;
+            top: 3px;
+        }
+
+        .radio-input:checked ~ .radio-design::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+        }
+
+        /* Улучшенный поиск */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 20px;
+        }
+
+        .search-input {
+            padding-left: 50px;
+            font-size: 17px;
+        }
+
+        /* Категории приемов пищи */
+        .meal-categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .meal-category {
+            background: white;
+            border: 1.5px solid #e5e5ea;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .meal-category.active {
+            border-color: var(--primary);
+            background-color: #f9f9ff;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .meal-category:active {
+            transform: scale(0.97);
+        }
+
+        .meal-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .meal-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Стили для удаления воды */
+        .water-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .delete-water {
+            position: absolute;
+            right: -70px;
+            top: 0;
+            height: 100%;
+            width: 70px;
+            background: var(--danger);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: right 0.3s ease;
+            cursor: pointer;
+        }
+
+        .water-item.swiped .delete-water {
+            right: 0;
+        }
+
+        /* Адаптивность для очень маленьких экранов */
+        @media (max-width: 340px) {
+            .meal-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .progress-ring {
+                width: 140px;
+                height: 140px;
+            }
+        }
+
+        /* Категории продуктов */
+        .category-tabs {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            scrollbar-width: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            flex: 0 0 auto;
+            padding: 10px 16px;
+            margin-right: 8px;
+            background: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border: 1.5px solid #e5e5ea;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .category-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Загрузчик */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 122, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Новые стили для улучшенного UI */
+        
+        /* Кнопка удаления */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .delete-btn:hover {
+            background-color: rgba(255, 59, 48, 0.1);
+        }
+        
+        .delete-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 59, 48, 0.2);
+        }
+        
+        /* Контейнер для элемента с кнопкой удаления */
+        .item-with-delete {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        /* Анимация удаления элемента */
+        @keyframes slideOut {
+            from { 
+                opacity: 1;
+                transform: translateX(0);
+                max-height: 100px;
+            }
+            to { 
+                opacity: 0;
+                transform: translateX(-100%);
+                max-height: 0;
+                padding: 0;
+                margin: 0;
+            }
+        }
+        
+        .removing {
+            animation: slideOut 0.4s ease forwards;
+            overflow: hidden;
+        }
+        
+        /* Стили для категорий продуктов */
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--primary);
+        }
+        
+        .category-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        /* Улучшенные карточки продуктов */
+        .product-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .product-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-macros {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        
+        .macro-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .macro-protein {
+            background: rgba(255, 149, 0, 0.15);
+            color: #FF9500;
+        }
+        
+        .macro-carbs {
+            background: rgba(52, 199, 89, 0.15);
+            color: #34C759;
+        }
+        
+        .macro-fat {
+            background: rgba(0, 122, 255, 0.15);
+            color: #007AFF;
+        }
+        
+        .product-calories {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        /* Конфетти-эффект для достижения цели */
+        @keyframes confettiFall {
+            0% { 
+                transform: translateY(-100%) rotate(0deg); 
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh) rotate(360deg); 
+                opacity: 0;
+            }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            opacity: 0;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        /* Стили для уведомлений */
+        .notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 2000;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Заголовок приложения -->
+        <div class="header">
+            <h1>NutriLife</h1>
+            <div class="subtitle" id="current-date">Сегодня, 25 октября</div>
+        </div>
+
+        <!-- Страница дневника -->
+        <div class="page" id="diary-page">
+            <div class="card">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="ring-bg" cx="50" cy="50" r="45" />
+                        <circle class="ring-progress" cx="50" cy="50" r="45" 
+                                stroke-dasharray="283" stroke-dashoffset="141.5" />
+                    </svg>
+                    <div class="progress-text">
+                        <div class="progress-calories" id="consumed-calories">0</div>
+                        <div class="progress-goal">из <span id="calorie-goal">2000</span> ккал</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Макронутриенты</h2>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-weight: 600;">Белки</span>
+                        <span id="protein-value">0г</span>
+                    </div>
+                    <div class="macro-bar">
+                        <div class="macro-progress protein" style="width: 30%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-weight: 600;">Углеводы</span>
+                        <span id="carbs-value">0г</span>
+                    </div>
+                    <div class="macro-bar">
+                        <div class="macro-progress carbs" style="width: 40%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-weight: 600;">Жиры</span>
+                        <span id="fat-value">0г</span>
+                    </div>
+                    <div class="macro-bar">
+                        <div class="macro-progress fat" style="width: 25%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Приемы пищи сегодня</h2>
+                <div class="meal-categories">
+                    <div class="meal-category active" data-meal="breakfast">
+                        <div class="meal-icon"><i class="fas fa-egg"></i></div>
+                        <div class="meal-name">Завтрак</div>
+                    </div>
+                    <div class="meal-category" data-meal="lunch">
+                        <div class="meal-icon"><i class="fas fa-utensils"></i></div>
+                        <div class="meal-name">Обед</div>
+                    </div>
+                    <div class="meal-category" data-meal="dinner">
+                        <div class="meal-icon"><i class="fas fa-fish"></i></div>
+                        <div class="meal-name">Ужин</div>
+                    </div>
+                    <div class="meal-category" data-meal="snack">
+                        <div class="meal-icon"><i class="fas fa-apple-alt"></i></div>
+                        <div class="meal-name">Перекус</div>
+                    </div>
+                </div>
+                <button class="btn" id="add-food-btn"><i class="fas fa-plus"></i> Добавить продукт</button>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Сегодня</h2>
+                <ul class="food-list" id="today-food-list">
+                    <li class="empty-state">Добавьте продукты, чтобы начать отслеживание</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Страница поиска продуктов -->
+        <div class="page" id="search-page">
+            <div class="card">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="food-search" class="search-input" placeholder="Поиск продуктов...">
+                </div>
+                <div class="category-tabs" id="category-tabs">
+                    <!-- Категории будут добавлены через JS -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Часто используемые</h2>
+                <ul class="food-list" id="common-foods">
+                    <li class="food-item">
+                        <div>
+                            <div class="food-name">Куриная грудка</div>
+                            <div class="food-details">100г • 165 ккал</div>
+                        </div>
+                        <div class="food-calories">165</div>
+                    </li>
+                    <li class="food-item">
+                        <div>
+                            <div class="food-name">Овсянка</div>
+                            <div class="food-details">100г • 68 ккал</div>
+                        </div>
+                        <div class="food-calories">68</div>
+                    </li>
+                    <li class="food-item">
+                        <div>
+                            <div class="food-name">Банан</div>
+                            <div class="food-details">1 шт • 105 ккал</div>
+                        </div>
+                        <div class="food-calories">105</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Результаты поиска</h2>
+                <div id="category-results">
+                    <!-- Здесь будут отображаться продукты по категориям -->
+                </div>
+                <ul class="food-list" id="search-results">
+                    <li class="empty-state">Начните поиск продуктов или выберите категорию</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Страница воды -->
+        <div class="page" id="water-page">
+            <div class="card" style="text-align: center;">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Вода сегодня</h2>
+                <div style="font-size: 56px; font-weight: 900; color: var(--primary); margin-bottom: 10px;" id="water-consumed">0</div>
+                <div style="color: var(--text-secondary); margin-bottom: 24px; font-size: 17px;">из <span id="water-goal">8</span> стаканов</div>
+                <button class="btn" id="add-water-btn"><i class="fas fa-plus"></i> Добавить стакан</button>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">История</h2>
+                <ul class="food-list" id="water-history">
+                    <li class="empty-state">Вода будет отображаться здесь</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Страница профиля -->
+        <div class="page" id="profile-page">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Мои данные</h2>
+                <div class="form-group">
+                    <label for="user-weight">Вес (кг)</label>
+                    <input type="number" id="user-weight" placeholder="70">
+                </div>
+                <div class="form-group">
+                    <label for="user-height">Рост (см)</label>
+                    <input type="number" id="user-height" placeholder="175">
+                </div>
+                <div class="form-group">
+                    <label for="user-age">Возраст</label>
+                    <input type="number" id="user-age" placeholder="30">
+                </div>
+                <div class="form-group">
+                    <label for="user-gender">Пол</label>
+                    <select id="user-gender">
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-activity">Активность</label>
+                    <select id="user-activity">
+                        <option value="sedentary">Сидячий образ жизни</option>
+                        <option value="light">Легкая активность</option>
+                        <option value="moderate">Умеренная активность</option>
+                        <option value="active">Высокая активность</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-goal">Цель</label>
+                    <select id="user-goal">
+                        <option value="lose">Похудение</option>
+                        <option value="maintain">Поддержание веса</option>
+                        <option value="gain">Набор массы</option>
+                    </select>
+                </div>
+                <button class="btn btn-calculate" id="calculate-goals-btn">Рассчитать норму калорий</button>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="calorie-target">Целевое количество калорий</label>
+                    <input type="number" id="calorie-target" placeholder="2000">
+                </div>
+                <button class="btn" id="save-profile-btn">Сохранить изменения</button>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Дневная норма</h2>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
+                    <span style="font-weight: 600;">Калории</span>
+                    <span id="profile-calories">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
+                    <span style="font-weight: 600;">Белки</span>
+                    <span id="profile-protein">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
+                    <span style="font-weight: 600;">Углеводы</span>
+                    <span id="profile-carbs">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight: 600;">Жиры</span>
+                    <span id="profile-fat">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Навигационная панель -->
+        <div class="nav-tabs">
+            <a href="#" class="nav-tab" data-page="diary-page">
+                <i class="fas fa-utensils"></i>
+                <span>Дневник</span>
+            </a>
+            <a href="#" class="nav-tab" data-page="search-page">
+                <i class="fas fa-search"></i>
+                <span>Поиск</span>
+            </a>
+            <a href="#" class="nav-tab" data-page="water-page">
+                <i class="fas fa-tint"></i>
+                <span>Вода</span>
+            </a>
+            <a href="#" class="nav-tab" data-page="profile-page">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </div>
+
+        <!-- Модальное окно добавления пищи -->
+        <div class="modal" id="add-food-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Добавить продукт</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label for="food-name">Название продукта</label>
+                    <input type="text" id="food-name" placeholder="Например, Куриная грудка">
+                </div>
+                <div class="form-group">
+                    <label for="food-amount">Количество (г)</label>
+                    <input type="number" id="food-amount" placeholder="100">
+                </div>
+                <div class="form-group">
+                    <label>Прием пищи</label>
+                    <div class="meal-categories">
+                        <div class="meal-category active" data-meal="breakfast">
+                            <div class="meal-icon"><i class="fas fa-egg"></i></div>
+                            <div class="meal-name">Завтрак</div>
+                        </div>
+                        <div class="meal-category" data-meal="lunch">
+                            <div class="meal-icon"><i class="fas fa-utensils"></i></div>
+                            <div class="meal-name">Обед</div>
+                        </div>
+                        <div class="meal-category" data-meal="dinner">
+                            <div class="meal-icon"><i class="fas fa-fish"></i></div>
+                            <div class="meal-name">Ужин</div>
+                        </div>
+                        <div class="meal-category" data-meal="snack">
+                            <div class="meal-icon"><i class="fas fa-apple-alt"></i></div>
+                            <div class="meal-name">Перекус</div>
+                        </div>
+                </div>
+                <button class="btn" id="save-food-btn">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Основной код приложения
+        (function() {
+            'use strict';
+
+            // Состояние приложения
+            let state = {
+                profile: {
+                    weight: null,
+                    height: null,
+                    age: null,
+                    gender: 'male',
+                    goal: 'maintain',
+                    activity: 'moderate',
+                    calorieGoal: 2000,
+                    proteinGoal: 150,
+                    carbsGoal: 250,
+                    fatGoal: 67
+                },
+                diary: {
+                    foods: [],
+                    water: [],
+                    consumedCalories: 0,
+                    consumedProtein: 0,
+                    consumedCarbs: 0,
+                    consumedFat: 0
+                },
+                waterGoal: 8,
+                selectedMeal: 'breakfast',
+                currentFoodCategory: 'all',
+                hasCompletedSetup: false  // Флаг, указывающий, завершена ли первоначальная настройка
+            };
+
+            // Расширенная база данных продуктов с категориями
+            const foodDatabase = [
+                // Мясо и птица
+                { name: 'Куриная грудка', calories: 165, protein: 31, carbs: 0, fat: 3.6, category: 'meat' },
+                { name: 'Говядина', calories: 250, protein: 26, carbs: 0, fat: 15, category: 'meat' },
+                { name: 'Свинина', calories: 242, protein: 25, carbs: 0, fat: 16, category: 'meat' },
+                { name: 'Индейка', calories: 135, protein: 29, carbs: 0, fat: 3.2, category: 'meat' },
+                { name: 'Баранина', calories: 294, protein: 25, carbs: 0, fat: 21, category: 'meat' },
+                { name: 'Куриное бедро', calories: 209, protein: 26, carbs: 0, fat: 11, category: 'meat' },
+                { name: 'Ветчина', calories: 145, protein: 18, carbs: 1.5, fat: 6, category: 'meat' },
+                { name: 'Колбаса', calories: 300, protein: 12, carbs: 2, fat: 28, category: 'meat' },
+                
+                // Рыба и морепродукты
+                { name: 'Лосось', calories: 208, protein: 20, carbs: 0, fat: 13, category: 'fish' },
+                { name: 'Тунец', calories: 184, protein: 30, carbs: 0, fat: 6, category: 'fish' },
+                { name: 'Треска', calories: 82, protein: 18, carbs: 0, fat: 0.7, category: 'fish' },
+                { name: 'Сельдь', calories: 158, protein: 18, carbs: 0, fat: 9, category: 'fish' },
+                { name: 'Креветки', calories: 99, protein: 24, carbs: 0.2, fat: 0.3, category: 'fish' },
+                { name: 'Мидии', calories: 86, protein: 12, carbs: 3.7, fat: 2.2, category: 'fish' },
+                { name: 'Кальмар', calories: 92, protein: 16, carbs: 3.1, fat: 1.4, category: 'fish' },
+                
+                // Овощи
+                { name: 'Огурец', calories: 15, protein: 0.7, carbs: 3.6, fat: 0.1, category: 'vegetables' },
+                { name: 'Помидор', calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2, category: 'vegetables' },
+                { name: 'Картофель', calories: 77, protein: 2, carbs: 17, fat: 0.1, category: 'vegetables' },
+                { name: 'Морковь', calories: 41, protein: 0.9, carbs: 10, fat: 0.2, category: 'vegetables' },
+                { name: 'Капуста', calories: 25, protein: 1.3, carbs: 5.8, fat: 0.1, category: 'vegetables' },
+                { name: 'Брокколи', calories: 34, protein: 2.8, carbs: 7, fat: 0.4, category: 'vegetables' },
+                { name: 'Лук', calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1, category: 'vegetables' },
+                { name: 'Чеснок', calories: 149, protein: 6.4, carbs: 33, fat: 0.5, category: 'vegetables' },
+                { name: 'Перец болгарский', calories: 26, protein: 1, carbs: 6, fat: 0.3, category: 'vegetables' },
+                { name: 'Кабачок', calories: 17, protein: 1.2, carbs: 3.1, fat: 0.3, category: 'vegetables' },
+                
+                // Фрукты и ягоды
+                { name: 'Яблоко', calories: 52, protein: 0.3, carbs: 14, fat: 0.2, category: 'fruits' },
+                { name: 'Банан', calories: 105, protein: 1.3, carbs: 27, fat: 0.4, category: 'fruits' },
+                { name: 'Апельсин', calories: 47, protein: 0.9, carbs: 12, fat: 0.1, category: 'fruits' },
+                { name: 'Груша', calories: 57, protein: 0.4, carbs: 15, fat: 0.1, category: 'fruits' },
+                { name: 'Клубника', calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3, category: 'fruits' },
+                { name: 'Виноград', calories: 69, protein: 0.7, carbs: 18, fat: 0.2, category: 'fruits' },
+                { name: 'Персик', calories: 39, protein: 0.9, carbs: 10, fat: 0.3, category: 'fruits' },
+                { name: 'Абрикос', calories: 48, protein: 1.4, carbs: 11, fat: 0.4, category: 'fruits' },
+                { name: 'Слива', calories: 46, protein: 0.7, carbs: 11, fat: 0.3, category: 'fruits' },
+                { name: 'Вишня', calories: 50, protein: 1, carbs: 12, fat: 0.3, category: 'fruits' },
+                { name: 'Арбуз', calories: 30, protein: 0.6, carbs: 7.6, fat: 0.2, category: 'fruits' },
+                { name: 'Дыня', calories: 34, protein: 0.8, carbs: 8.2, fat: 0.2, category: 'fruits' },
+                { name: 'Манго', calories: 60, protein: 0.8, carbs: 15, fat: 0.4, category: 'fruits' },
+                { name: 'Ананас', calories: 50, protein: 0.5, carbs: 13, fat: 0.1, category: 'fruits' },
+                
+                // Крупы и зерновые
+                { name: 'Овсянка', calories: 68, protein: 2.4, carbs: 12, fat: 1.4, category: 'grains' },
+                { name: 'Рис', calories: 130, protein: 2.7, carbs: 28, fat: 0.3, category: 'grains' },
+                { name: 'Гречка', calories: 110, protein: 4.2, carbs: 21, fat: 1.1, category: 'grains' },
+                { name: 'Пшено', calories: 119, protein: 3.5, carbs: 23, fat: 1, category: 'grains' },
+                { name: 'Перловка', calories: 123, protein: 2.3, carbs: 28, fat: 0.4, category: 'grains' },
+                { name: 'Манка', calories: 360, protein: 10, carbs: 73, fat: 1, category: 'grains' },
+                { name: 'Кукурузная крупа', calories: 337, protein: 8.3, carbs: 75, fat: 1.2, category: 'grains' },
+                { name: 'Хлеб пшеничный', calories: 265, protein: 9, carbs: 49, fat: 3.2, category: 'grains' },
+                { name: 'Хлеб ржаной', calories: 259, protein: 9, carbs: 48, fat: 3.3, category: 'grains' },
+                { name: 'Макароны', calories: 131, protein: 5, carbs: 25, fat: 1, category: 'grains' },
+                
+                // Молочные продукты
+                { name: 'Молоко', calories: 60, protein: 3.2, carbs: 4.8, fat: 3.6, category: 'dairy' },
+                { name: 'Творог', calories: 120, protein: 17, carbs: 3, fat: 5, category: 'dairy' },
+                { name: 'Сыр', calories: 350, protein: 25, carbs: 2, fat: 28, category: 'dairy' },
+                { name: 'Йогурт', calories: 70, protein: 4, carbs: 6, fat: 3.5, category: 'dairy' },
+                { name: 'Кефир', calories: 50, protein: 3, carbs: 4, fat: 2, category: 'dairy' },
+                { name: 'Сметана', calories: 200, protein: 2.5, carbs: 3.5, fat: 20, category: 'dairy' },
+                { name: 'Сливки', calories: 205, protein: 2.5, carbs: 3.7, fat: 20, category: 'dairy' },
+                { name: 'Масло сливочное', calories: 717, protein: 0.5, carbs: 0.8, fat: 81, category: 'dairy' },
+                
+                // Орехи и семена
+                { name: 'Грецкий орех', calories: 654, protein: 15, carbs: 14, fat: 65, category: 'nuts' },
+                { name: 'Миндаль', calories: 579, protein: 21, carbs: 22, fat: 50, category: 'nuts' },
+                { name: 'Арахис', calories: 567, protein: 26, carbs: 16, fat: 49, category: 'nuts' },
+                { name: 'Фундук', calories: 628, protein: 15, carbs: 17, fat: 61, category: 'nuts' },
+                { name: 'Кешью', calories: 553, protein: 18, carbs: 30, fat: 44, category: 'nuts' },
+                { name: 'Семечки подсолнечника', calories: 584, protein: 21, carbs: 20, fat: 51, category: 'nuts' },
+                { name: 'Семечки тыквенные', calories: 559, protein: 30, carbs: 11, fat: 49, category: 'nuts' },
+                
+                // Напитки (включая запрошенные)
+                { name: 'Чай черный', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Чай зеленый', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Кофе черный', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Компот', calories: 60, protein: 0.3, carbs: 15, fat: 0, category: 'beverades' },
+                { name: 'Сок яблочный', calories: 46, protein: 0.1, carbs: 11, fat: 0.1, category: 'beverages' },
+                { name: 'Сок апельсиновый', calories: 45, protein: 0.7, carbs: 10, fat: 0.2, category: 'beverages' },
+                { name: 'Сок томатный', calories: 17, protein: 0.9, carbs: 3.5, fat: 0.1, category: 'beverages' },
+                { name: 'Морс', calories: 40, protein: 0.2, carbs: 10, fat: 0, category: 'beverages' },
+                { name: 'Квас', calories: 27, protein: 0.2, carbs: 5.2, fat: 0, category: 'beverades' },
+                { name: 'Лимонад', calories: 40, protein: 0, carbs: 10, fat: 0, category: 'beverages' },
+                { name: 'Кока-колa', calories: 42, protein: 0, carbs: 10.6, fat: 0, category: 'beverages' },
+                { name: 'Пепси', calories: 43, protein: 0, carbs: 10.9, fat: 0, category: 'beverages' },
+                { name: 'Спрайт', calories: 40, protein: 0, carbs: 10, fat: 0, category: 'beverages' },
+                { name: 'Минеральная вода', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                
+                // Сладости и десерты
+                { name: 'Шоколад молочный', calories: 546, protein: 7, carbs: 54, fat: 31, category: 'sweets' },
+                { name: 'Шоколад горький', calories: 539, protein: 6, carbs: 45, fat: 35, category: 'sweets' },
+                { name: 'Печенье', calories: 417, protein: 6, carbs: 76, fat: 10, category: 'sweets' },
+                { name: 'Торт', calories: 350, protein: 5, carbs: 45, fat: 16, category: 'sweets' },
+                { name: 'Мед', calories: 304, protein: 0.3, carbs: 82, fat: 0, category: 'sweets' },
+                { name: 'Варенье', calories: 265, protein: 0.3, carbs: 70, fat: 0.1, category: 'sweets' },
+                { name: 'Мороженое', calories: 207, protein: 3.5, carbs: 24, fat: 11, category: 'sweets' },
+                { name: 'Конфеты', calories: 360, protein: 3, carbs: 80, fat: 5, category: 'sweets' },
+                
+                // Прочее
+                { name: 'Яйцо', calories: 78, protein: 6.3, carbs: 0.6, fat: 5.3, category: 'other' },
+                { name: 'Масло подсолнечное', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Масло оливковое', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Майонез', calories: 680, protein: 1, carbs: 2.6, fat: 72, category: 'other' },
+                { name: 'Кетчуп', calories: 101, protein: 1.7, carbs: 25, fat: 0.3, category: 'other' },
+                { name: 'Горчица', calories: 162, protein: 5, carbs: 12, fat: 11, category: 'other' },
+                { name: 'Соевый соус', calories: 53, protein: 6, carbs: 5, fat: 0, category: 'other' }
+            ];
+
+            // Категории продуктов
+            const foodCategories = [
+                { id: 'all', name: 'Все', icon: 'fas fa-list' },
+                { id: 'meat', name: 'Мясо', icon: 'fas fa-drumstick-bite' },
+                { id: 'fish', name: 'Рыба', icon: 'fas fa-fish' },
+                { id: 'vegetables', name: 'Овощи', icon: 'fas fa-carrot' },
+                { id: 'fruits', name: 'Фрукты', icon: 'fas fa-apple-alt' },
+                { id: 'grains', name: 'Крупы', icon: 'fas fa-bread-slice' },
+                { id: 'dairy', name: 'Молочное', icon: 'fas fa-cheese' },
+                { id: 'nuts', name: 'Орехи', icon: 'fas fa-acorn' },
+                { id: 'beverages', name: 'Напитки', icon: 'fas fa-glass-whiskey' },
+                { id: 'sweets', name: 'Сладости', icon: 'fas fa-candy-cane' },
+                { id: 'other', name: 'Прочее', icon: 'fas fa-ellipsis-h' }
+            ];
+
+            // Инициализация приложения
+            function init() {
+                // Установка текущей даты
+                const now = new Date();
+                const options = { day: 'numeric', month: 'long' };
+                document.getElementById('current-date').textContent = now.toLocaleDateString('ru-RU', options);
+
+                // Загрузка данных из localStorage
+                loadData();
+
+                // Настройка навигации
+                setupNavigation();
+
+                // Настройка обработчиков событий
+                setupEventHandlers();
+
+                // Инициализация категорий
+                initCategories();
+
+                // Обновление интерфейса
+                updateUI();
+
+                // Определяем, какую страницу открывать
+                if (!state.hasCompletedSetup) {
+                    // Первый запуск - открываем профиль
+                    showPage('profile-page');
+                    showNotification('Заполните данные профиля и нажмите "Рассчитать"');
+                } else {
+                    // Последующие запуски - открываем дневник
+                    showPage('diary-page');
+                }
+            }
+
+            // Функция для отображения страницы
+            function showPage(pageId) {
+                // Скрываем все страницы
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Показываем нужную страницу
+                document.getElementById(pageId).classList.add('active');
+                
+                // Обновляем навигацию
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.getAttribute('data-page') === pageId) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
+
+            // Показ уведомления
+            function showNotification(message, duration = 3000) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, duration);
+            }
+
+            // Инициализация категорий продуктов
+            function initCategories() {
+                const container = document.getElementById('category-tabs');
+                container.innerHTML = foodCategories.map(category => 
+                    `<div class="category-tab ${category.id === 'all' ? 'active' : ''}" data-category="${category.id}">
+                        <i class="${category.icon}"></i> ${category.name}
+                    </div>`
+                ).join('');
+                
+                // Добавляем обработчики событий для категорий
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        state.currentFoodCategory = this.getAttribute('data-category');
+                        
+                        // Если выбран не "Все", показываем продукты категории
+                        if (state.currentFoodCategory !== 'all') {
+                            showCategoryProducts(state.currentFoodCategory);
+                        } else {
+                            // Очищаем результаты категорий и показываем стандартное сообщение
+                            document.getElementById('category-results').innerHTML = '';
+                            document.getElementById('search-results').innerHTML = '<li class="empty-state">Начните поиск продуктов или выберите категорию</li>';
+                        }
+                    });
+                });
+            }
+
+            // Показ продуктов по категории
+            function showCategoryProducts(categoryId) {
+                const categoryResults = document.getElementById('category-results');
+                const searchResults = document.getElementById('search-results');
+                
+                // Очищаем результаты поиска
+                searchResults.innerHTML = '';
+                
+                // Получаем продукты выбранной категории
+                const categoryProducts = foodDatabase.filter(food => food.category === categoryId);
+                
+                if (categoryProducts.length === 0) {
+                    categoryResults.innerHTML = '<div class="empty-state">В этой категории пока нет продуктов</div>';
+                    return;
+                }
+                
+                // Получаем информацию о категории
+                const categoryInfo = foodCategories.find(c => c.id === categoryId);
+                
+                // Создаем красивый заголовок категории
+                categoryResults.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="${categoryInfo.icon}"></i>
+                        </div>
+                        <h3 class="category-title">${categoryInfo.name}</h3>
+                    </div>
+                    <div class="category-products">
+                        ${categoryProducts.map(product => `
+                            <div class="product-card" data-food='${JSON.stringify(product)}'>
+                                <div class="product-info">
+                                    <div class="food-name">${product.name}</div>
+                                    <div class="product-macros">
+                                        <span class="macro-badge macro-protein">Б: ${product.protein}г</span>
+                                        <span class="macro-badge macro-carbs">У: ${product.carbs}г</span>
+                                        <span class="macro-badge macro-fat">Ж: ${product.fat}г</span>
+                                    </div>
+                                </div>
+                                <div class="product-calories">${product.calories} ккал</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Добавляем обработчики для выбора продукта
+                document.querySelectorAll('.product-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        const foodData = JSON.parse(this.getAttribute('data-food'));
+                        document.getElementById('food-name').value = foodData.name;
+                        closeModal();
+                        openAddFoodModal();
+                    });
+                });
+            }
+
+            // Загрузка данных из localStorage
+            function loadData() {
+                const savedData = localStorage.getItem('nutrilifeData');
+                if (savedData) {
+                    state = JSON.parse(savedData);
+                }
+            }
+
+            // Сохранение данных в localStorage
+            function saveData() {
+                localStorage.setItem('nutrilifeData', JSON.stringify(state));
+            }
+
+            // Настройка навигации
+            function setupNavigation() {
+                const tabs = document.querySelectorAll('.nav-tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const pageId = this.getAttribute('data-page');
+                        showPage(pageId);
+                    });
+                });
+            }
+
+            // Настройка обработчиков событий
+            function setupEventHandlers() {
+                // Кнопка добавления пищи
+                document.getElementById('add-food-btn').addEventListener('click', openAddFoodModal);
+                
+                // Выбор категории приема пищи
+                document.querySelectorAll('.meal-category').forEach(category => {
+                    category.addEventListener('click', function() {
+                        document.querySelectorAll('.meal-category').forEach(c => c.classList.remove('active'));
+                        this.classList.add('active');
+                        state.selectedMeal = this.getAttribute('data-meal');
+                    });
+                });
+                
+                // Сохранение профиля
+                document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+                
+                // Расчет целей
+                document.getElementById('calculate-goals-btn').addEventListener('click', calculateGoalsFromForm);
+                
+                // Добавление воды
+                document.getElementById('add-water-btn').addEventListener('click', addWater);
+                
+                // Модальное окно
+                document.querySelector('.modal-close').addEventListener('click', closeModal);
+                document.getElementById('save-food-btn').addEventListener('click', saveFood);
+                
+                // Поиск продуктов
+                document.getElementById('food-search').addEventListener('input', searchFoods);
+            }
+
+            // Расчет целей на основе данных формы
+            function calculateGoalsFromForm() {
+                // Получаем значения из формы
+                const weight = parseInt(document.getElementById('user-weight').value);
+                const height = parseInt(document.getElementById('user-height').value);
+                const age = parseInt(document.getElementById('user-age').value);
+                const gender = document.getElementById('user-gender').value;
+                const activity = document.getElementById('user-activity').value;
+                const goal = document.getElementById('user-goal').value;
+                
+                if (!weight || !height || !age) {
+                    showNotification('Пожалуйста, заполните все поля: вес, рост и возраст');
+                    return;
+                }
+                
+                // Сохранение данных профиля
+                state.profile.weight = weight;
+                state.profile.height = height;
+                state.profile.age = age;
+                state.profile.gender = gender;
+                state.profile.activity = activity;
+                state.profile.goal = goal;
+                
+                // Расчет целей
+                calculateGoals();
+                
+                // Обновление интерфейса
+                updateUI();
+                
+                // Показываем уведомление об успехе
+                showNotification('Норма калорий рассчитана успешно!');
+                
+                // Помечаем, что настройка завершена
+                state.hasCompletedSetup = true;
+                saveData();
+                
+                // Переходим на страницу дневника
+                showPage('diary-page');
+            }
+
+            // Открытие модального окна добавления пищи
+            function openAddFoodModal() {
+                // Проверяем, заполнен ли профиль
+                if (!state.hasCompletedSetup) {
+                    showNotification('Сначала заполните данные профиля и рассчитайте норму калорий');
+                    
+                    // Переключаемся на страницу профиля
+                    showPage('profile-page');
+                    return;
+                }
+                
+                document.getElementById('add-food-modal').classList.add('active');
+                document.getElementById('food-name').focus();
+            }
+
+            // Закрытие модального окна
+            function closeModal() {
+                document.getElementById('add-food-modal').classList.remove('active');
+            }
+
+            // Сохранение добавленной пищи
+            function saveFood() {
+                const name = document.getElementById('food-name').value;
+                const amount = parseInt(document.getElementById('food-amount').value);
+                const meal = state.selectedMeal;
+                
+                if (!name || !amount) {
+                    showNotification('Пожалуйста, заполните все поля');
+                    return;
+                }
+                
+                // Поиск продукта в базе
+                const foodItem = foodDatabase.find(item => 
+                    item.name.toLowerCase().includes(name.toLowerCase())
+                );
+                
+                if (!foodItem) {
+                    showNotification('Продукт не найден в базе данных. Пожалуйста, выберите другой продукт.');
+                    return;
+                }
+                
+                // Расчет питательных веществ на основе количества
+                const ratio = amount / 100;
+                const calories = Math.round(foodItem.calories * ratio);
+                const protein = Math.round(foodItem.protein * ratio);
+                const carbs = Math.round(foodItem.carbs * ratio);
+                const fat = Math.round(foodItem.fat * ratio);
+                
+                // Добавление пищи в дневник
+                state.diary.foods.push({
+                    id: Date.now(), // уникальный идентификатор для возможности удаления
+                    name: foodItem.name,
+                    amount,
+                    meal,
+                    calories,
+                    protein,
+                    carbs,
+                    fat,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Обновление статистики
+                updateNutritionData();
+                
+                // Закрытие модального окна и обновление интерфейса
+                closeModal();
+                updateUI();
+                saveData();
+                
+                // Сброс полей формы
+                document.getElementById('food-name').value = '';
+                document.getElementById('food-amount').value = '';
+            }
+
+            // Поиск продуктов
+            function searchFoods() {
+                const query = document.getElementById('food-search').value.toLowerCase();
+                const resultsContainer = document.getElementById('search-results');
+                const categoryResults = document.getElementById('category-results');
+                
+                // Если есть поисковый запрос, очищаем результаты категорий
+                if (query.length > 0) {
+                    categoryResults.innerHTML = '';
+                } else if (state.currentFoodCategory !== 'all') {
+                    // Если запроса нет и выбрана категория, показываем продукты категории
+                    showCategoryProducts(state.currentFoodCategory);
+                    return;
+                }
+                
+                if (query.length < 1) {
+                    resultsContainer.innerHTML = '<li class="empty-state">Введите название продукта для поиска</li>';
+                    return;
+                }
+                
+                let filteredFoods = foodDatabase.filter(food => 
+                    food.name.toLowerCase().includes(query)
+                );
+                
+                // Фильтрация по категории
+                if (state.currentFoodCategory !== 'all') {
+                    filteredFoods = filteredFoods.filter(food => 
+                        food.category === state.currentFoodCategory
+                    );
+                }
+                
+                if (filteredFoods.length === 0) {
+                    resultsContainer.innerHTML = '<li class="empty-state">Ничего не найдено</li>';
+                    return;
+                }
+                
+                resultsContainer.innerHTML = filteredFoods.map(food => `
+                    <li class="food-item" data-food='${JSON.stringify(food)}'>
+                        <div>
+                            <div class="food-name">${food.name}</div>
+                            <div class="food-details">100г • ${food.calories} ккал • Б:${food.protein}г, У:${food.carbs}г, Ж:${food.fat}г</div>
+                        </div>
+                        <div class="food-calories">${food.calories}</div>
+                    </li>
+                `).join('');
+                
+                // Добавляем обработчики для выбора продукта
+                document.querySelectorAll('#search-results .food-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const foodData = JSON.parse(this.getAttribute('data-food'));
+                        document.getElementById('food-name').value = foodData.name;
+                        closeModal();
+                        openAddFoodModal();
+                    });
+                });
+            }
+
+            // Добавление воды
+            function addWater() {
+                // Проверяем, заполнен ли профиль
+                if (!state.hasCompletedSetup) {
+                    showNotification('Сначала заполните данные профиля и рассчитайте норму калорий');
+                    
+                    // Переключаемся на страницу профиля
+                    showPage('profile-page');
+                    return;
+                }
+                
+                state.diary.water.push({
+                    id: Date.now(), // уникальный идентификатор для возможности удаления
+                    amount: 250, // мл в стакане
+                    timestamp: new Date().toISOString()
+                });
+                
+                updateUI();
+                saveData();
+                
+                // Анимация добавления
+                const waterCount = document.getElementById('water-consumed');
+                waterCount.classList.add('pulse');
+                setTimeout(() => waterCount.classList.remove('pulse'), 600);
+                
+                // Проверка достижения цели по воде
+                if (state.diary.water.length >= state.waterGoal) {
+                    showConfetti();
+                }
+            }
+
+            // Удаление записи о воде
+            function deleteWater(id) {
+                const waterItem = document.querySelector(`.water-item[data-id="${id}"]`);
+                if (waterItem) {
+                    waterItem.classList.add('removing');
+                    setTimeout(() => {
+                        state.diary.water = state.diary.water.filter(item => item.id !== id);
+                        updateUI();
+                        saveData();
+                    }, 400);
+                }
+            }
+
+            // Удаление записи о еде
+            function deleteFood(id) {
+                const foodItem = document.querySelector(`.food-item[data-id="${id}"]`);
+                if (foodItem) {
+                    foodItem.classList.add('removing');
+                    setTimeout(() => {
+                        state.diary.foods = state.diary.foods.filter(item => item.id !== id);
+                        updateNutritionData();
+                        updateUI();
+                        saveData();
+                    }, 400);
+                }
+            }
+
+            // Эффект конфетти при достижении цели
+            function showConfetti() {
+                const colors = ['#007AFF', '#5856D6', '#34C759', '#FF9500', '#FF3B30'];
+                
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.style.animation = 'confettiFall 2s ease forwards';
+                    }, 10);
+                    
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.parentNode.removeChild(confetti);
+                        }
+                    }, 3000);
+                }
+            }
+
+            // Сохранение профиля
+            function saveProfile() {
+                state.profile.weight = parseInt(document.getElementById('user-weight').value) || state.profile.weight;
+                state.profile.height = parseInt(document.getElementById('user-height').value) || state.profile.height;
+                state.profile.age = parseInt(document.getElementById('user-age').value) || state.profile.age;
+                state.profile.gender = document.getElementById('user-gender').value;
+                state.profile.goal = document.getElementById('user-goal').value;
+                state.profile.activity = document.getElementById('user-activity').value;
+                
+                // Обновление целевых калорий, если пользователь изменил их вручную
+                const calorieTarget = parseInt(document.getElementById('calorie-target').value);
+                if (calorieTarget && calorieTarget > 0) {
+                    state.profile.calorieGoal = calorieTarget;
+                }
+                
+                updateUI();
+                saveData();
+                
+                // Показываем подтверждение
+                showNotification('Данные сохранены!');
+            }
+
+            // Расчет целей по калориям и макронутриентам
+            function calculateGoals() {
+                // Формула Миффлина-Сан Жеора для расчета базового метаболизма
+                let bmr;
+                if (state.profile.gender === 'male') {
+                    bmr = 10 * state.profile.weight + 6.25 * state.profile.height - 5 * state.profile.age + 5;
+                } else {
+                    bmr = 10 * state.profile.weight + 6.25 * state.profile.height - 5 * state.profile.age - 161;
+                }
+                
+                // Учет уровня активности
+                const activityMultipliers = {
+                    sedentary: 1.2,
+                    light: 1.375,
+                    moderate: 1.55,
+                    active: 1.725
+                };
+                
+                let calorieGoal = Math.round(bmr * activityMultipliers[state.profile.activity]);
+                
+                // Учет цели
+                if (state.profile.goal === 'lose') {
+                    calorieGoal -= 500;
+                } else if (state.profile.goal === 'gain') {
+                    calorieGoal += 500;
+                }
+                
+                // Установка целей по макронутриентам (стандартное соотношение)
+                state.profile.calorieGoal = calorieGoal;
+                state.profile.proteinGoal = Math.round(state.profile.weight * 2); // 2г белка на кг веса
+                state.profile.carbsGoal = Math.round((calorieGoal * 0.5) / 4); // 50% от калорий, 1г углеводов = 4 ккал
+                state.profile.fatGoal = Math.round((calorieGoal * 0.3) / 9); // 30% от калорий, 1г жиров = 9 ккал
+            }
+
+            // Обновление данных о питании
+            function updateNutritionData() {
+                // Сброс показателей
+                state.diary.consumedCalories = 0;
+                state.diary.consumedProtein = 0;
+                state.diary.consumedCarbs = 0;
+                state.diary.consumedFat = 0;
+                
+                // Суммирование потребленных питательных веществ
+                state.diary.foods.forEach(food => {
+                    state.diary.consumedCalories += food.calories;
+                    state.diary.consumedProtein += food.protein;
+                    state.diary.consumedCarbs += food.carbs;
+                    state.diary.consumedFat += food.fat;
+                });
+            }
+
+            // Обновление интерфейса
+            function updateUI() {
+                // Обновление кольца прогресса калорий
+                const caloriesProgress = Math.min(state.diary.consumedCalories / state.profile.calorieGoal, 1);
+                const circumference = 2 * Math.PI * 45;
+                const offset = circumference - (caloriesProgress * circumference);
+                
+                document.querySelector('.ring-progress').style.strokeDasharray = circumference;
+                document.querySelector('.ring-progress').style.strokeDashoffset = offset;
+                
+                document.getElementById('consumed-calories').textContent = state.diary.consumedCalories;
+                document.getElementById('calorie-goal').textContent = state.profile.calorieGoal;
+                
+                // Обновление макронутриентов
+                document.getElementById('protein-value').textContent = `${state.diary.consumedProtein}г`;
+                document.getElementById('carbs-value').textContent = `${state.diary.consumedCarbs}г`;
+                document.getElementById('fat-value').textContent = `${state.diary.consumedFat}г`;
+                
+                document.querySelector('.protein').style.width = `${Math.min(state.diary.consumedProtein / state.profile.proteinGoal, 1) * 100}%`;
+                document.querySelector('.carbs').style.width = `${Math.min(state.diary.consumedCarbs / state.profile.carbsGoal, 1) * 100}%`;
+                document.querySelector('.fat').style.width = `${Math.min(state.diary.consumedFat / state.profile.fatGoal, 1) * 100}%`;
+                
+                // Обновление списка пищи
+                const foodList = document.getElementById('today-food-list');
+                if (state.diary.foods.length === 0) {
+                    foodList.innerHTML = '<li class="empty-state">Добавьте продукты, чтобы начать отслеживание</li>';
+                } else {
+                    foodList.innerHTML = state.diary.foods.map(food => `
+                        <li class="food-item" data-id="${food.id}">
+                            <div class="item-with-delete">
+                                <div>
+                                    <div class="food-name">${food.name}</div>
+                                    <div class="food-details">${food.amount}г • ${food.meal === 'breakfast' ? 'Завтрак' : 
+                                        food.meal === 'lunch' ? 'Обед' : 
+                                        food.meal === 'dinner' ? 'Ужин' : 'Перекус'}</div>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="food-calories">${food.calories}</div>
+                                    <button class="delete-btn" onclick="deleteFood(${food.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+                
+                // Обновление данных о воде
+                const waterConsumed = state.diary.water.length;
+                document.getElementById('water-consumed').textContent = waterConsumed;
+                document.getElementById('water-goal').textContent = state.waterGoal;
+                
+                const waterHistory = document.getElementById('water-history');
+                if (waterConsumed === 0) {
+                    waterHistory.innerHTML = '<li class="empty-state">Вода будет отображаться здесь</li>';
+                } else {
+                    waterHistory.innerHTML = state.diary.water.map(entry => {
+                        const date = new Date(entry.timestamp);
+                        return `
+                            <li class="food-item water-item" data-id="${entry.id}">
+                                <div class="item-with-delete">
+                                    <div>
+                                        <div class="food-name">Стакан воды</div>
+                                        <div class="food-details">${date.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <div class="food-calories">250 мл</div>
+                                        <button class="delete-btn" onclick="deleteWater(${entry.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                    }).join('');
+                }
+                
+                // Обновление данных профиля
+                document.getElementById('user-weight').value = state.profile.weight || '';
+                document.getElementById('user-height').value = state.profile.height || '';
+                document.getElementById('user-age').value = state.profile.age || '';
+                document.getElementById('user-gender').value = state.profile.gender;
+                document.getElementById('user-goal').value = state.profile.goal;
+                document.getElementById('user-activity').value = state.profile.activity;
+                document.getElementById('calorie-target').value = state.profile.calorieGoal;
+                
+                document.getElementById('profile-calories').textContent = state.profile.calorieGoal || '-';
+                document.getElementById('profile-protein').textContent = state.profile.proteinGoal ? `${state.profile.proteinGoal}г` : '-';
+                document.getElementById('profile-carbs').textContent = state.profile.carbsGoal ? `${state.profile.carbsGoal}г` : '-';
+                document.getElementById('profile-fat').textContent = state.profile.fatGoal ? `${state.profile.fatGoal}г` : '-';
+            }
+
+            // Запуск приложения после загрузки DOM
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            // Делаем функции удаления глобальными для обработки событий onclick
+            window.deleteWater = deleteWater;
+            window.deleteFood = deleteFood;
+
+        })();
+    </script>
+</body>
+</html>
