@@ -1,0 +1,2918 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#007AFF" id="theme-color-meta">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>NutriLife</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Обновленные стили с улучшенным дизайном */
+        :root {
+            --primary: #007AFF;
+            --primary-dark: #0051a8;
+            --primary-light: rgba(0, 122, 255, 0.1);
+            --secondary: #5856D6;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+            --background: #F2F2F7;
+            --card-background: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+            --border-radius: 16px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Темная тема */
+        [data-theme="dark"] {
+            --primary: #0A84FF;
+            --primary-dark: #5e5ce6;
+            --primary-light: rgba(10, 132, 255, 0.1);
+            --background: #000000;
+            --card-background: #1C1C1E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8E8E93;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            max-width: 100vw;
+            overflow-x: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Кнопка переключения темы */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 16px;
+            z-index: 101;
+            background: var(--card-background);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .theme-toggle i {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        /* Улучшенная навигация */
+        .nav-tabs {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .nav-tabs {
+            background-color: rgba(28, 28, 30, 0.92);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+        }
+
+        .nav-tab i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 4px;
+            transition: var(--transition);
+        }
+
+        .nav-tab.active i {
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* Страницы */
+        .page {
+            display: none;
+            padding: 16px;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Улучшенный заголовок */
+        .header {
+            padding: 20px 16px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            z-index: 100;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] .header {
+            background-color: rgba(28, 28, 30, 0.92);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 32px;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Улучшенные карточки */
+        .card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Кольцо прогресса */
+        .progress-ring {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
+        }
+
+        .ring-bg {
+            fill: none;
+            stroke: #f0f0f5;
+            stroke-width: 10;
+        }
+
+        [data-theme="dark"] .ring-bg {
+            stroke: #2C2C2E;
+        }
+
+        .ring-progress {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-calories {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .progress-goal {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Полосы макронутриентов */
+        .macro-bar {
+            height: 8px;
+            background: #f0f0f5;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        [data-theme="dark"] .macro-bar {
+            background: #2C2C2E;
+        }
+
+        .macro-progress {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+            position: relative;
+        }
+
+        .macro-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        .protein { background: linear-gradient(90deg, #FF9500, #FFCC00); }
+        .carbs { background: linear-gradient(90deg, #34C759, #5AD427); }
+        .fat { background: linear-gradient(90deg, #007AFF, #5856D6); }
+
+        /* Формы и кнопки */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            font-size: 18px;
+            padding: 16px 18px;
+            border: 1.5px solid #e5e5ea;
+            border-radius: 12px;
+            background: #ffffff;
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] input,
+        [data-theme="dark"] select {
+            background: #2C2C2E;
+            border-color: #38383A;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #f9f9ff;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        [data-theme="dark"] input:focus,
+        [data-theme="dark"] select:focus {
+            background-color: rgba(10, 132, 255, 0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 18px 24px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.2), transparent);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover::after {
+            transform: translateY(0);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e5e5ea;
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] .btn-secondary {
+            background: #2C2C2E;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, var(--success), #2AA84B);
+            margin-top: 10px;
+        }
+
+        /* Списки */
+        .food-list {
+            list-style: none;
+        }
+
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid #f1f1f2;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        [data-theme="dark"] .food-item {
+            border-bottom: 1px solid #38383A;
+        }
+
+        .food-item:active {
+            background-color: #f9f9ff;
+        }
+
+        [data-theme="dark"] .food-item:active {
+            background-color: rgba(10, 132, 255, 0.1);
+        }
+
+        .food-item:last-child {
+            border-bottom: none;
+        }
+
+        .food-name {
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .food-details {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-top: 4px;
+        }
+
+        .food-calories {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 17px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 50px 20px;
+            font-style: italic;
+            font-size: 17px;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow: auto;
+            padding: 28px;
+            animation: fadeIn 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        [data-theme="dark"] .modal-content {
+            background: #1C1C1E;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:active {
+            background-color: #f0f0f5;
+        }
+
+        [data-theme="dark"] .modal-close:active {
+            background-color: #2C2C2E;
+        }
+
+        /* Чекбоксы и радиокнопки в стиле iOS */
+        .checkbox-group, .radio-group {
+            margin-bottom: 20px;
+        }
+
+        .checkbox-label, .radio-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .checkbox-input, .radio-input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .checkbox-design, .radio-design {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #c5c5c7;
+            border-radius: 6px;
+            margin-right: 12px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .radio-design {
+            border-radius: 50%;
+        }
+
+        .checkbox-input:checked ~ .checkbox-design,
+        .radio-input:checked ~ .radio-design {
+            border-color: var(--primary);
+            background-color: var(--primary);
+        }
+
+        .checkbox-input:checked ~ .checkbox-design::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) translate(-1px, -1px);
+            left: 7px;
+            top: 3px;
+        }
+
+        .radio-input:checked ~ .radio-design::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+        }
+
+        /* Улучшенный поиск */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 20px;
+        }
+
+        .search-input {
+            padding-left: 50px;
+            font-size: 17px;
+        }
+
+        /* Категории приемов пищи */
+        .meal-categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .meal-category {
+            background: white;
+            border: 1.5px solid #e5e5ea;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        [data-theme="dark"] .meal-category {
+            background: #2C2C2E;
+            border-color: #38383A;
+        }
+
+        .meal-category.active {
+            border-color: var(--primary);
+            background-color: #f9f9ff;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        [data-theme="dark"] .meal-category.active {
+            background-color: rgba(10, 132, 255, 0.1);
+        }
+
+        .meal-category:active {
+            transform: scale(0.97);
+        }
+
+        .meal-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .meal-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Стили для удаления воды */
+        .water-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .delete-water {
+            position: absolute;
+            right: -70px;
+            top: 0;
+            height: 100%;
+            width: 70px;
+            background: var(--danger);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: right 0.3s ease;
+            cursor: pointer;
+        }
+
+        .water-item.swiped .delete-water {
+            right: 0;
+        }
+
+        /* Адаптивность для очень маленьких экранов */
+        @media (max-width: 340px) {
+            .meal-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .progress-ring {
+                width: 140px;
+                height: 140px;
+            }
+        }
+
+        /* Категории продуктов */
+        .category-tabs {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            scrollbar-width: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            flex: 0 0 auto;
+            padding: 10px 16px;
+            margin-right: 8px;
+            background: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border: 1.5px solid #e5e5ea;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        [data-theme="dark"] .category-tab {
+            background: #2C2C2E;
+            border-color: #38383A;
+        }
+
+        .category-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Загрузчик */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 122, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Новые стили для улучшенного UI */
+        
+        /* Кнопка удаления */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .delete-btn:hover {
+            background-color: rgba(255, 59, 48, 0.1);
+        }
+        
+        .delete-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 59, 48, 0.2);
+        }
+        
+        /* Контейнер для элемента с кнопкой удаления */
+        .item-with-delete {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        /* Анимация удаления элемента */
+        @keyframes slideOut {
+            from { 
+                opacity: 1;
+                transform: translateX(0);
+                max-height: 100px;
+            }
+            to { 
+                opacity: 0;
+                transform: translateX(-100%);
+                max-height: 0;
+                padding: 0;
+                margin: 0;
+            }
+        }
+        
+        .removing {
+            animation: slideOut 0.4s ease forwards;
+            overflow: hidden;
+        }
+        
+        /* Стили для категорий продуктов */
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--primary);
+        }
+        
+        .category-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        /* Улучшенные карточки продуктов */
+        .product-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        [data-theme="dark"] .product-card {
+            background: #2C2C2E;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .product-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-macros {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        
+        .macro-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .macro-protein {
+            background: rgba(255, 149, 0, 0.15);
+            color: #FF9500;
+        }
+        
+        .macro-carbs {
+            background: rgba(52, 199, 89, 0.15);
+            color: #34C759;
+        }
+        
+        .macro-fat {
+            background: rgba(0, 122, 255, 0.15);
+            color: #007AFF;
+        }
+        
+        .product-calories {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        /* Конфетти-эффект для достижения цели */
+        @keyframes confettiFall {
+            0% { 
+                transform: translateY(-100%) rotate(0deg); 
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh) rotate(360deg); 
+                opacity: 0;
+            }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            opacity: 0;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        /* Стили для уведомлений */
+        .notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 2000;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* Автодополнение */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-background);
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            margin-top: 5px;
+        }
+
+        .autocomplete-suggestion {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f1f2;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .autocomplete-suggestion {
+            border-bottom: 1px solid #38383A;
+        }
+
+        .autocomplete-suggestion:hover {
+            background-color: #f9f9ff;
+        }
+
+        [data-theme="dark"] .autocomplete-suggestion:hover {
+            background-color: rgba(10, 132, 255, 0.1);
+        }
+
+        .autocomplete-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .fastfood-warning {
+            background-color: rgba(255, 59, 48, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 16px;
+            margin-top: 16px;
+            border-radius: 8px;
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .fastfood-warning {
+            background-color: rgba(255, 59, 48, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Кнопка переключения темы -->
+        <button class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- Заголовок приложения -->
+        <div class="header">
+            <h1>NutriLife</h1>
+            <div class="subtitle" id="current-date">Сегодня, 25 октября</div>
+        </div>
+
+        <!-- Страница дневника -->
+        <div class="page" id="diary-page">
+            <div class="card">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="ring-bg" cx="50" cy="50" r="45" />
+                        <circle class="ring-progress" cx="50" cy="50" r="45" 
+                                stroke-dasharray="283" stroke-dashoffset="141.5" />
+                    </svg>
+                    <div class="progress-text">
+                        <div class="progress-calories" id="consumed-calories">0</div>
+                        <div class="progress-goal">из <span id="calorie-goal">2000</span> ккал</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Макронутриенты</h2>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-weight: 600;">Белки</span>
+                        <span id="protein-value">0г</span>
+                    </div>
+                    <div class="macro-bar">
+                        <div class="macro-progress protein" style="width: 30%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-weight: 600;">Углеводы</span>
+                        <span id="carbs-value">0г</span>
+                    </div>
+                    <div class="macro-bar">
+                        <div class="macro-progress carbs" style="width: 40%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-weight: 600;">Жиры</span>
+                        <span id="fat-value">0г</span>
+                    </div>
+                    <div class="macro-bar">
+                        <div class="macro-progress fat" style="width: 25%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Приемы пищи сегодня</h2>
+                <div class="meal-categories">
+                    <div class="meal-category active" data-meal="breakfast">
+                        <div class="meal-icon"><i class="fas fa-egg"></i></div>
+                        <div class="meal-name">Завтрак</div>
+                    </div>
+                    <div class="meal-category" data-meal="lunch">
+                        <div class="meal-icon"><i class="fas fa-utensils"></i></div>
+                        <div class="meal-name">Обед</div>
+                    </div>
+                    <div class="meal-category" data-meal="dinner">
+                        <div class="meal-icon"><i class="fas fa-fish"></i></div>
+                        <div class="meal-name">Ужин</div>
+                    </div>
+                    <div class="meal-category" data-meal="snack">
+                        <div class="meal-icon"><i class="fas fa-apple-alt"></i></div>
+                        <div class="meal-name">Перекус</div>
+                    </div>
+                </div>
+                <button class="btn" id="add-food-btn"><i class="fas fa-plus"></i> Добавить продукт</button>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Сегодня</h2>
+                <ul class="food-list" id="today-food-list">
+                    <li class="empty-state">Добавьте продукты, чтобы начать отслеживание</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Страница поиска продуктов -->
+        <div class="page" id="search-page">
+            <div class="card">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="food-search" class="search-input" placeholder="Поиск продуктов...">
+                </div>
+                <div class="category-tabs" id="category-tabs">
+                    <!-- Категории будут добавлены через JS -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Результаты поиска</h2>
+                <div id="category-results">
+                    <!-- Здесь будут отображаться продукты по категориям -->
+                </div>
+                <ul class="food-list" id="search-results">
+                    <li class="empty-state">Начните поиск продуктов или выберите категорию</li>
+                </ul>
+            </div>
+
+            <!-- Перемещенный блок "Часто используемые" под результаты поиска -->
+            <div class="card" id="frequently-used-card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Часто используемые</h2>
+                <ul class="food-list" id="common-foods">
+                    <li class="empty-state">Добавляйте продукты, чтобы они появились здесь</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Страница воды -->
+        <div class="page" id="water-page">
+            <div class="card" style="text-align: center;">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Вода сегодня</h2>
+                <div style="font-size: 56px; font-weight: 900; color: var(--primary); margin-bottom: 10px;" id="water-consumed">0</div>
+                <div style="color: var(--text-secondary); margin-bottom: 24px; font-size: 17px;">из <span id="water-goal">8</span> стаканов</div>
+                <button class="btn" id="add-water-btn"><i class="fas fa-plus"></i> Добавить стакан</button>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">История</h2>
+                <ul class="food-list" id="water-history">
+                    <li class="empty-state">Вода будет отображаться здесь</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Страница профиля -->
+        <div class="page" id="profile-page">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Мои данные</h2>
+                <div class="form-group">
+                    <label for="user-weight">Вес (кг)</label>
+                    <input type="number" id="user-weight" placeholder="70">
+                </div>
+                <div class="form-group">
+                    <label for="user-height">Рост (см)</label>
+                    <input type="number" id="user-height" placeholder="175">
+                </div>
+                <div class="form-group">
+                    <label for="user-age">Возраст</label>
+                    <input type="number" id="user-age" placeholder="30">
+                </div>
+                <div class="form-group">
+                    <label for="user-gender">Пол</label>
+                    <select id="user-gender">
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-activity">Активность</label>
+                    <select id="user-activity">
+                        <option value="sedentary">Сидячий образ жизни</option>
+                        <option value="light">Легкая активность</option>
+                        <option value="moderate">Умеренная активность</option>
+                        <option value="active">Высокая активность</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-goal">Цель</label>
+                    <select id="user-goal">
+                        <option value="lose">Похудение</option>
+                        <option value="maintain">Поддержание веса</option>
+                        <option value="gain">Набор массы</option>
+                    </select>
+                </div>
+                <button class="btn btn-calculate" id="calculate-goals-btn">Рассчитать норму калорий</button>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="calorie-target">Целевое количество калорий</label>
+                    <input type="number" id="calorie-target" placeholder="2000">
+                </div>
+                <button class="btn" id="save-profile-btn">Сохранить изменения</button>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px; font-size: 20px; font-weight: 700;">Дневная норма</h2>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
+                    <span style="font-weight: 600;">Калории</span>
+                    <span id="profile-calories">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
+                    <span style="font-weight: 600;">Белки</span>
+                    <span id="profile-protein">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
+                    <span style="font-weight: 600;">Углеводы</span>
+                    <span id="profile-carbs">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight: 600;">Жиры</span>
+                    <span id="profile-fat">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Навигационная панель -->
+        <div class="nav-tabs">
+            <a href="#" class="nav-tab" data-page="diary-page">
+                <i class="fas fa-utensils"></i>
+                <span>Дневник</span>
+            </a>
+            <a href="#" class="nav-tab" data-page="search-page">
+                <i class="fas fa-search"></i>
+                <span>Поиск</span>
+            </a>
+            <a href="#" class="nav-tab" data-page="water-page">
+                <i class="fas fa-tint"></i>
+                <span>Вода</span>
+            </a>
+            <a href="#" class="nav-tab" data-page="profile-page">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </div>
+
+        <!-- Модальное окно добавления пищи -->
+        <div class="modal" id="add-food-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Добавить продукт</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="form-group autocomplete-container">
+                    <label for="food-name">Название продукта</label>
+                    <input type="text" id="food-name" placeholder="Например, Куриная грудка">
+                    <div class="autocomplete-suggestions" id="food-suggestions" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="food-amount">Количество (г)</label>
+                    <input type="number" id="food-amount" placeholder="100">
+                </div>
+                <div class="form-group">
+                    <label>Прием пищи</label>
+                    <div class="meal-categories">
+                        <div class="meal-category active" data-meal="breakfast">
+                            <div class="meal-icon"><i class="fas fa-egg"></i></div>
+                            <div class="meal-name">Завтрак</div>
+                        </div>
+                        <div class="meal-category" data-meal="lunch">
+                            <div class="meal-icon"><i class="fas fa-utensils"></i></div>
+                            <div class="meal-name">Обед</div>
+                        </div>
+                        <div class="meal-category" data-meal="dinner">
+                            <div class="meal-icon"><i class="fas fa-fish"></i></div>
+                            <div class="meal-name">Ужин</div>
+                        </div>
+                        <div class="meal-category" data-meal="snack">
+                            <div class="meal-icon"><i class="fas fa-apple-alt"></i></div>
+                            <div class="meal-name">Перекус</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="fastfood-warning" class="fastfood-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i> Зачем ты это сделал? Фастфуд вредит твоему здоровью! Больше так не делай!
+                </div>
+                <button class="btn" id="save-food-btn">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Основной код приложения
+        (function() {
+            'use strict';
+
+            // Состояние приложения
+            let state = {
+                profile: {
+                    weight: null,
+                    height: null,
+                    age: null,
+                    gender: 'male',
+                    goal: 'maintain',
+                    activity: 'moderate',
+                    calorieGoal: 2000,
+                    proteinGoal: 150,
+                    carbsGoal: 250,
+                    fatGoal: 67
+                },
+                diary: {
+                    foods: [],
+                    water: [],
+                    consumedCalories: 0,
+                    consumedProtein: 0,
+                    consumedCarbs: 0,
+                    consumedFat: 0
+                },
+                frequentlyUsed: {}, // Объект для отслеживания часто используемых продуктов
+                waterGoal: 8,
+                selectedMeal: 'breakfast',
+                currentFoodCategory: 'all',
+                hasCompletedSetup: false,  // Флаг, указывающий, завершена ли первоначальная настройка
+                darkMode: false  // Флаг темной темы
+            };
+
+            // Расширенная база данных продуктов с категориями
+            const foodDatabase = [
+                { name: 'Куриная грудка', calories: 165, protein: 31, carbs: 0, fat: 3.6, category: 'meat' },
+                { name: 'Куриное бедро', calories: 209, protein: 26, carbs: 0, fat: 11, category: 'meat' },
+                { name: 'Куриное филе', calories: 110, protein: 23, carbs: 0, fat: 1.2, category: 'meat' },
+                { name: 'Куриные окорочка', calories: 184, protein: 21, carbs: 0, fat: 11, category: 'meat' },
+                { name: 'Куриные крылышки', calories: 203, protein: 30, carbs: 0, fat: 8, category: 'meat' },
+                { name: 'Индейка (грудка)', calories: 135, protein: 29, carbs: 0, fat: 3.2, category: 'meat' },
+                { name: 'Индейка (бедро)', calories: 144, protein: 19, carbs: 0, fat: 7, category: 'meat' },
+                { name: 'Говядина (вырезка)', calories: 250, protein: 26, carbs: 0, fat: 15, category: 'meat' },
+                { name: 'Говядина (фарш)', calories: 332, protein: 14, carbs: 0, fat: 30, category: 'meat' },
+                { name: 'Говяжья печень', calories: 135, protein: 20, carbs: 4, fat: 4, category: 'meat' },
+                { name: 'Говяжье сердце', calories: 112, protein: 17, carbs: 0.5, fat: 4.5, category: 'meat' },
+                { name: 'Свинина (вырезка)', calories: 242, protein: 25, carbs: 0, fat: 16, category: 'meat' },
+                { name: 'Свиная отбивная', calories: 250, protein: 23, carbs: 0, fat: 17, category: 'meat' },
+                { name: 'Свиная корейка', calories: 257, protein: 16, carbs: 0, fat: 21, category: 'meat' },
+                { name: 'Свиной фарш', calories: 263, protein: 16, carbs: 0, fat: 21, category: 'meat' },
+                { name: 'Баранина', calories: 294, protein: 25, carbs: 0, fat: 21, category: 'meat' },
+                { name: 'Бараний фарш', calories: 282, protein: 17, carbs: 0, fat: 23, category: 'meat' },
+                { name: 'Кролик', calories: 173, protein: 33, carbs: 0, fat: 4, category: 'meat' },
+                { name: 'Утка', calories: 337, protein: 19, carbs: 0, fat: 28, category: 'meat' },
+                { name: 'Гусь', calories: 371, protein: 16, carbs: 0, fat: 33, category: 'meat' },
+                { name: 'Оленина', calories: 158, protein: 30, carbs: 0, fat: 4, category: 'meat' },
+                { name: 'Колбаса докторская', calories: 257, protein: 12, carbs: 2, fat: 22, category: 'meat' },
+                { name: 'Колбаса салями', calories: 407, protein: 22, carbs: 2, fat: 34, category: 'meat' },
+                { name: 'Сервелат', calories: 461, protein: 24, carbs: 2, fat: 40, category: 'meat' },
+                { name: 'Ветчина', calories: 270, protein: 17, carbs: 1, fat: 22, category: 'meat' },
+                { name: 'Бекон', calories: 541, protein: 37, carbs: 1, fat: 42, category: 'meat' },
+                { name: 'Сало', calories: 797, protein: 2, carbs: 0, fat: 89, category: 'meat' },
+                { name: 'Сосиски молочные', calories: 260, protein: 11, carbs: 2, fat: 23, category: 'meat' },
+                { name: 'Сардельки говяжьи', calories: 215, protein: 11, carbs: 2, fat: 18, category: 'meat' },
+                { name: 'Пельмени', calories: 275, protein: 12, carbs: 29, fat: 12, category: 'meat' },
+                { name: 'Хот-дог', calories: 290, protein: 10, carbs: 4, fat: 26, category: 'meat' },
+                { name: 'Говяжий язык', calories: 224, protein: 16, carbs: 0, fat: 17, category: 'meat' },
+                { name: 'Свиной язык', calories: 208, protein: 16, carbs: 0, fat: 16, category: 'meat' },
+                { name: 'Куриная печень', calories: 137, protein: 20, carbs: 1, fat: 6, category: 'meat' },
+                { name: 'Куриные желудки', calories: 114, protein: 18, carbs: 0, fat: 4, category: 'meat' },
+                { name: 'Куриные сердечки', calories: 159, protein: 16, carbs: 1, fat: 10, category: 'meat' },
+                
+                // Рыба и морепродукты (увеличенный список)
+                { name: 'Лосось', calories: 208, protein: 20, carbs: 0, fat: 13, category: 'fish' },
+                { name: 'Семга', calories: 202, protein: 22, carbs: 0, fat: 12, category: 'fish' },
+                { name: 'Форель', calories: 148, protein: 20, carbs: 0, fat: 7, category: 'fish' },
+                { name: 'Горбуша', calories: 147, protein: 21, carbs: 0, fat: 7, category: 'fish' },
+                { name: 'Кета', calories: 127, protein: 19, carbs: 0, fat: 5.5, category: 'fish' },
+                { name: 'Нерка', calories: 158, protein: 21, carbs: 0, fat: 8, category: 'fish' },
+                { name: 'Тунец', calories: 184, protein: 30, carbs: 0, fat: 6, category: 'fish' },
+                { name: 'Треска', calories: 82, protein: 18, carbs: 0, fat: 0.7, category: 'fish' },
+                { name: 'Палтус', calories: 186, protein: 19, carbs: 0, fat: 12, category: 'fish' },
+                { name: 'Скумбрия', calories: 262, protein: 19, carbs: 0, fat: 21, category: 'fish' },
+                { name: 'Сельдь', calories: 158, protein: 18, carbs: 0, fat: 9, category: 'fish' },
+                { name: 'Камбала', calories: 91, protein: 16, carbs: 0, fat: 2.5, category: 'fish' },
+                { name: 'Окунь морской', calories: 117, protein: 20, carbs: 0, fat: 3.5, category: 'fish' },
+                { name: 'Судак', calories: 84, protein: 19, carbs: 0, fat: 0.8, category: 'fish' },
+                { name: 'Щука', calories: 88, protein: 19, carbs: 0, fat: 0.7, category: 'fish' },
+                { name: 'Сом', calories: 95, protein: 16, carbs: 0, fat: 3, category: 'fish' },
+                { name: 'Карп', calories: 127, protein: 18, carbs: 0, fat: 5.5, category: 'fish' },
+                { name: 'Кальмар', calories: 92, protein: 16, carbs: 3.1, fat: 1.4, category: 'fish' },
+                { name: 'Креветки', calories: 99, protein: 24, carbs: 0.2, fat: 0.3, category: 'fish' },
+                { name: 'Мидии', calories: 86, protein: 12, carbs: 3.7, fat: 2.2, category: 'fish' },
+                { name: 'Устрицы', calories: 81, protein: 9, carbs: 4.5, fat: 2.5, category: 'fish' },
+                { name: 'Краб', calories: 87, protein: 18, carbs: 0, fat: 1.5, category: 'fish' },
+                { name: 'Омар', calories: 90, protein: 19, carbs: 1, fat: 1, category: 'fish' },
+                { name: 'Икра красная', calories: 252, protein: 25, carbs: 4, fat: 14, category: 'fish' },
+                { name: 'Икра черная', calories: 264, protein: 25, carbs: 4, fat: 17, category: 'fish' },
+                { name: 'Икра минтая', calories: 132, protein: 28, carbs: 1.5, fat: 1.5, category: 'fish' },
+                { name: 'Крабовые палочки', calories: 88, protein: 9, carbs: 10, fat: 1, category: 'fish' },
+                { name: 'Сельдь соленая', calories: 217, protein: 20, carbs: 0, fat: 15, category: 'fish' },
+                { name: 'Скумбрия копченая', calories: 221, protein: 21, carbs: 0, fat: 15, category: 'fish' },
+                { name: 'Лосось слабосоленый', calories: 202, protein: 23, carbs: 0, fat: 12, category: 'fish' },
+                { name: 'Тунец консервированный', calories: 128, protein: 24, carbs: 0, fat: 3, category: 'fish' },
+                { name: 'Сардины консервированные', calories: 208, protein: 25, carbs: 0, fat: 11, category: 'fish' },
+                { name: 'Шпроты', calories: 363, protein: 18, carbs: 0, fat: 32, category: 'fish' },
+                { name: 'Креветки вареные', calories: 95, protein: 19, carbs: 0, fat: 1, category: 'fish' },
+                { name: 'Мидии вареные', calories: 77, protein: 11, carbs: 3.5, fat: 1.5, category: 'fish' },
+                { name: 'Кальмар вареный', calories: 110, protein: 18, carbs: 3, fat: 2.5, category: 'fish' },
+                { name: 'Осьминог', calories: 82, protein: 15, carbs: 2, fat: 1, category: 'fish' },
+                { name: 'Морской гребешок', calories: 88, protein: 17, carbs: 2, fat: 1, category: 'fish' },
+                { name: 'Угорь', calories: 184, protein: 18, carbs: 0, fat: 12, category: 'fish' },
+                { name: 'Анчоусы', calories: 131, protein: 20, carbs: 0, fat: 5, category: 'fish' },
+                { name: 'Треска копченая', calories: 105, protein: 23, carbs: 0, fat: 1, category: 'fish' },
+                { name: 'Сом копченый', calories: 129, protein: 19, carbs: 0, fat: 5, category: 'fish' },
+                
+                // Овощи (увеличенный список)
+                { name: 'Огурец', calories: 15, protein: 0.7, carbs: 3.6, fat: 0.1, category: 'vegetables' },
+                { name: 'Помидор', calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2, category: 'vegetables' },
+                { name: 'Картофель', calories: 77, protein: 2, carbs: 17, fat: 0.1, category: 'vegetables' },
+                { name: 'Картофель жареный', calories: 192, protein: 2.8, carbs: 24, fat: 9.5, category: 'vegetables' },
+                { name: 'Картофель фри', calories: 312, protein: 3.4, carbs: 41, fat: 15, category: 'vegetables' },
+                { name: 'Морковь', calories: 41, protein: 0.9, carbs: 10, fat: 0.2, category: 'vegetables' },
+                { name: 'Капуста белокочанная', calories: 25, protein: 1.3, carbs: 5.8, fat: 0.1, category: 'vegetables' },
+                { name: 'Капуста краснокочанная', calories: 31, protein: 1.4, carbs: 7, fat: 0.2, category: 'vegetables' },
+                { name: 'Капуста цветная', calories: 25, protein: 2, carbs: 5, fat: 0.3, category: 'vegetables' },
+                { name: 'Капуста брокколи', calories: 34, protein: 2.8, carbs: 7, fat: 0.4, category: 'vegetables' },
+                { name: 'Капуста брюссельская', calories: 43, protein: 3.4, carbs: 9, fat: 0.3, category: 'vegetables' },
+                { name: 'Капуста пекинская', calories: 16, protein: 1.2, carbs: 3.2, fat: 0.2, category: 'vegetables' },
+                { name: 'Лук репчатый', calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1, category: 'vegetables' },
+                { name: 'Лук зеленый', calories: 20, protein: 1.3, carbs: 3.2, fat: 0.1, category: 'vegetables' },
+                { name: 'Чеснок', calories: 149, protein: 6.4, carbs: 33, fat: 0.5, category: 'vegetables' },
+                { name: 'Перец болгарский', calories: 26, protein: 1, carbs: 6, fat: 0.3, category: 'vegetables' },
+                { name: 'Перец чили', calories: 40, protein: 2, carbs: 9, fat: 0.2, category: 'vegetables' },
+                { name: 'Кабачок', calories: 17, protein: 1.2, carbs: 3.1, fat: 0.3, category: 'vegetables' },
+                { name: 'Баклажан', calories: 24, protein: 1, carbs: 5.7, fat: 0.2, category: 'vegetables' },
+                { name: 'Тыква', calories: 26, protein: 1, carbs: 6.5, fat: 0.1, category: 'vegetables' },
+                { name: 'Свекла', calories: 43, protein: 1.6, carbs: 9.6, fat: 0.2, category: 'vegetables' },
+                { name: 'Редис', calories: 16, protein: 0.7, carbs: 3.4, fat: 0.1, category: 'vegetables' },
+                { name: 'Редька', calories: 21, protein: 1.2, carbs: 4.1, fat: 0.1, category: 'vegetables' },
+                { name: 'Репа', calories: 28, protein: 0.9, carbs: 6.2, fat: 0.1, category: 'vegetables' },
+                { name: 'Шпинат', calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4, category: 'vegetables' },
+                { name: 'Щавель', calories: 22, protein: 1.5, carbs: 3, fat: 0.3, category: 'vegetables' },
+                { name: 'Салат листовой', calories: 15, protein: 1.4, carbs: 2.9, fat: 0.2, category: 'vegetables' },
+                { name: 'Сельдерей (стебли)', calories: 14, protein: 0.7, carbs: 3, fat: 0.2, category: 'vegetables' },
+                { name: 'Сельдерей (корень)', calories: 42, protein: 1.5, carbs: 9.2, fat: 0.3, category: 'vegetables' },
+                { name: 'Спаржа', calories: 20, protein: 2.2, carbs: 3.9, fat: 0.1, category: 'vegetables' },
+                { name: 'Артишок', calories: 47, protein: 3.3, carbs: 10.5, fat: 0.2, category: 'vegetables' },
+                { name: 'Имбирь', calories: 80, protein: 1.8, carbs: 18, fat: 0.8, category: 'vegetables' },
+                { name: 'Кукуруза вареная', calories: 123, protein: 4.1, carbs: 22.5, fat: 2.3, category: 'vegetables' },
+                { name: 'Горох зеленый', calories: 81, protein: 5.4, carbs: 14.5, fat: 0.4, category: 'vegetables' },
+                { name: 'Зеленая фасоль', calories: 31, protein: 1.8, carbs: 7, fat: 0.2, category: 'vegetables' },
+                { name: 'Оливки зеленые', calories: 145, protein: 1, carbs: 3.8, fat: 15, category: 'vegetables' },
+                { name: 'Оливки черные', calories: 115, protein: 0.8, carbs: 6, fat: 11, category: 'vegetables' },
+                { name: 'Авокадо', calories: 160, protein: 2, carbs: 8.5, fat: 14.7, category: 'vegetables' },
+                { name: 'Томатная паста', calories: 82, protein: 4.3, carbs: 19, fat: 0.5, category: 'vegetables' },
+                { name: 'Кетчуп', calories: 101, protein: 1.7, carbs: 25, fat: 0.3, category: 'vegetables' },
+                { name: 'Хрен', calories: 56, protein: 2.2, carbs: 12, fat: 0.4, category: 'vegetables' },
+                { name: 'Квашеная капуста', calories: 19, protein: 0.9, carbs: 4.3, fat: 0.1, category: 'vegetables' },
+                { name: 'Маринованные огурцы', calories: 11, protein: 0.6, carbs: 2.3, fat: 0.1, category: 'vegetables' },
+                { name: 'Маринованные помидоры', calories: 15, protein: 0.8, carbs: 3.3, fat: 0.2, category: 'vegetables' },
+                { name: 'Грибы белые', calories: 34, protein: 3.7, carbs: 3.4, fat: 1.7, category: 'vegetables' },
+                { name: 'Шампиньоны', calories: 27, protein: 4.3, carbs: 1, fat: 1, category: 'vegetables' },
+                { name: 'Лисички', calories: 38, protein: 1.5, carbs: 6.9, fat: 0.5, category: 'vegetables' },
+                { name: 'Опята', calories: 22, protein: 2.2, carbs: 3.7, fat: 1.2, category: 'vegetables' },
+                { name: 'Грузди', calories: 16, protein: 1.8, carbs: 1.1, fat: 0.8, category: 'vegetables' },
+                { name: 'Подберезовики', calories: 31, protein: 3.3, carbs: 3.7, fat: 0.5, category: 'vegetables' },
+                { name: 'Подосиновики', calories: 22, protein: 3.3, carbs: 3.4, fat: 0.5, category: 'vegetables' },
+                { name: 'Трюфели', calories: 51, protein: 5.5, carbs: 5.3, fat: 0.4, category: 'vegetables' },
+                { name: 'Вешенки', calories: 33, protein: 3.3, carbs: 6.1, fat: 0.4, category: 'vegetables' },
+                
+                // Фрукты и ягоды (увеличенный список)
+                { name: 'Яблоко', calories: 52, protein: 0.3, carbs: 14, fat: 0.2, category: 'fruits' },
+                { name: 'Банан', calories: 105, protein: 1.3, carbs: 27, fat: 0.4, category: 'fruits' },
+                { name: 'Апельсин', calories: 47, protein: 0.9, carbs: 12, fat: 0.1, category: 'fruits' },
+                { name: 'Мандарин', calories: 53, protein: 0.8, carbs: 13, fat: 0.3, category: 'fruits' },
+                { name: 'Грейпфрут', calories: 42, protein: 0.8, carbs: 11, fat: 0.1, category: 'fruits' },
+                { name: 'Лимон', calories: 29, protein: 1.1, carbs: 9, fat: 0.3, category: 'fruits' },
+                { name: 'Лайм', calories: 30, protein: 0.7, carbs: 11, fat: 0.2, category: 'fruits' },
+                { name: 'Груша', calories: 57, protein: 0.4, carbs: 15, fat: 0.1, category: 'fruits' },
+                { name: 'Персик', calories: 39, protein: 0.9, carbs: 10, fat: 0.3, category: 'fruits' },
+                { name: 'Нектарин', calories: 44, protein: 1.1, carbs: 11, fat: 0.3, category: 'fruits' },
+                { name: 'Абрикос', calories: 48, protein: 1.4, carbs: 11, fat: 0.4, category: 'fruits' },
+                { name: 'Слива', calories: 46, protein: 0.7, carbs: 11, fat: 0.3, category: 'fruits' },
+                { name: 'Вишня', calories: 50, protein: 1, carbs: 12, fat: 0.3, category: 'fruits' },
+                { name: 'Черешня', calories: 63, protein: 1.1, carbs: 16, fat: 0.2, category: 'fruits' },
+                { name: 'Клубника', calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3, category: 'fruits' },
+                { name: 'Малина', calories: 52, protein: 1.2, carbs: 12, fat: 0.7, category: 'fruits' },
+                { name: 'Ежевика', calories: 43, protein: 1.4, carbs: 10, fat: 0.5, category: 'fruits' },
+                { name: 'Черника', calories: 57, protein: 0.7, carbs: 14, fat: 0.3, category: 'fruits' },
+                { name: 'Голубика', calories: 57, protein: 0.7, carbs: 14, fat: 0.3, category: 'fruits' },
+                { name: 'Клюква', calories: 46, protein: 0.4, carbs: 12, fat: 0.1, category: 'fruits' },
+                { name: 'Брусника', calories: 46, protein: 0.7, carbs: 8.6, fat: 0.5, category: 'fruits' },
+                { name: 'Смородина черная', calories: 63, protein: 1.4, carbs: 15, fat: 0.4, category: 'fruits' },
+                { name: 'Смородина красная', calories: 56, protein: 0.6, carbs: 13, fat: 0.2, category: 'fruits' },
+                { name: 'Крыжовник', calories: 44, protein: 0.9, carbs: 10, fat: 0.6, category: 'fruits' },
+                { name: 'Облепиха', calories: 82, protein: 1.2, carbs: 10, fat: 5.4, category: 'fruits' },
+                { name: 'Шиповник', calories: 162, protein: 1.6, carbs: 38, fat: 0.7, category: 'fruits' },
+                { name: 'Ананас', calories: 50, protein: 0.5, carbs: 13, fat: 0.1, category: 'fruits' },
+                { name: 'Манго', calories: 60, protein: 0.8, carbs: 15, fat: 0.4, category: 'fruits' },
+                { name: 'Киви', calories: 61, protein: 1.1, carbs: 15, fat: 0.5, category: 'fruits' },
+                { name: 'Папайя', calories: 43, protein: 0.5, carbs: 11, fat: 0.3, category: 'fruits' },
+                { name: 'Гранат', calories: 83, protein: 1.7, carbs: 19, fat: 1.2, category: 'fruits' },
+                { name: 'Хурма', calories: 67, protein: 0.5, carbs: 16, fat: 0.4, category: 'fruits' },
+                { name: 'Инжир', calories: 74, protein: 0.8, carbs: 19, fat: 0.3, category: 'fruits' },
+                { name: 'Финики', calories: 282, protein: 2.5, carbs: 75, fat: 0.4, category: 'fruits' },
+                { name: 'Курага', calories: 241, protein: 3.4, carbs: 63, fat: 0.5, category: 'fruits' },
+                { name: 'Чернослив', calories: 256, protein: 2.2, carbs: 65, fat: 0.7, category: 'fruits' },
+                { name: 'Изюм', calories: 299, protein: 3.1, carbs: 79, fat: 0.5, category: 'fruits' },
+                { name: 'Инжир сушеный', calories: 249, protein: 3.3, carbs: 64, fat: 0.9, category: 'fruits' },
+                { name: 'Арбуз', calories: 30, protein: 0.6, carbs: 7.6, fat: 0.2, category: 'fruits' },
+                { name: 'Дыня', calories: 34, protein: 0.8, carbs: 8.2, fat: 0.2, category: 'fruits' },
+                { name: 'Виноград', calories: 69, protein: 0.7, carbs: 18, fat: 0.2, category: 'fruits' },
+                { name: 'Авокадо', calories: 160, protein: 2, carbs: 8.5, fat: 14.7, category: 'fruits' },
+                { name: 'Маракуйя', calories: 97, protein: 2.2, carbs: 23, fat: 0.7, category: 'fruits' },
+                { name: 'Личи', calories: 66, protein: 0.8, carbs: 17, fat: 0.4, category: 'fruits' },
+                { name: 'Рамбутан', calories: 82, protein: 0.7, carbs: 21, fat: 0.2, category: 'fruits' },
+                { name: 'Дуриан', calories: 147, protein: 1.5, carbs: 27, fat: 5.3, category: 'fruits' },
+                { name: 'Помело', calories: 38, protein: 0.8, carbs: 10, fat: 0, category: 'fruits' },
+                { name: 'Кумкват', calories: 71, protein: 1.9, carbs: 16, fat: 0.9, category: 'fruits' },
+                { name: 'Фейхоа', calories: 49, protein: 1.2, carbs: 13, fat: 0.8, category: 'fruits' },
+                { name: 'Гуава', calories: 68, protein: 2.6, carbs: 14, fat: 1, category: 'fruits' },
+                { name: 'Карамбола', calories: 31, protein: 1, carbs: 7, fat: 0.3, category: 'fruits' },
+                { name: 'Саподилла', calories: 83, protein: 0.4, carbs: 20, fat: 1.1, category: 'fruits' },
+                { name: 'Сметанное яблоко', calories: 66, protein: 1, carbs: 17, fat: 0.3, category: 'fruits' },
+                { name: 'Мангостан', calories: 73, protein: 0.4, carbs: 18, fat: 0.6, category: 'fruits' },
+                
+                // Крупы и зерновые (увеличенный список)
+                { name: 'Овсянка', calories: 68, protein: 2.4, carbs: 12, fat: 1.4, category: 'grains' },
+                { name: 'Геркулес', calories: 355, protein: 13, carbs: 66, fat: 6.2, category: 'grains' },
+                { name: 'Рис белый', calories: 130, protein: 2.7, carbs: 28, fat: 0.3, category: 'grains' },
+                { name: 'Рис бурый', calories: 111, protein: 2.6, carbs: 23, fat: 0.9, category: 'grains' },
+                { name: 'Рис дикий', calories: 101, protein: 4, carbs: 21, fat: 0.3, category: 'grains' },
+                { name: 'Рис басмати', calories: 130, protein: 3, carbs: 28, fat: 0.4, category: 'grains' },
+                { name: 'Гречка', calories: 110, protein: 4.2, carbs: 21, fat: 1.1, category: 'grains' },
+                { name: 'Гречка зеленая', calories: 110, protein: 4.2, carbs: 21, fat: 1.1, category: 'grains' },
+                { name: 'Пшено', calories: 119, protein: 3.5, carbs: 23, fat: 1, category: 'grains' },
+                { name: 'Перловка', calories: 123, protein: 2.3, carbs: 28, fat: 0.4, category: 'grains' },
+                { name: 'Ячневая крупа', calories: 313, protein: 10, carbs: 65, fat: 1.3, category: 'grains' },
+                { name: 'Кукурузная крупа', calories: 337, protein: 8.3, carbs: 75, fat: 1.2, category: 'grains' },
+                { name: 'Манка', calories: 360, protein: 10, carbs: 73, fat: 1, category: 'grains' },
+                { name: 'Булгур', calories: 342, protein: 12, carbs: 76, fat: 1.3, category: 'grains' },
+                { name: 'Кускус', calories: 376, protein: 13, carbs: 77, fat: 0.6, category: 'grains' },
+                { name: 'Киноа', calories: 120, protein: 4.4, carbs: 21, fat: 1.9, category: 'grains' },
+                { name: 'Амарант', calories: 102, protein: 3.8, carbs: 19, fat: 1.6, category: 'grains' },
+                { name: 'Полба', calories: 338, protein: 15, carbs: 70, fat: 2.4, category: 'grains' },
+                { name: 'Рожь', calories: 338, protein: 10, carbs: 75, fat: 1.6, category: 'grains' },
+                { name: 'Пшеница', calories: 342, protein: 13, carbs: 72, fat: 2.5, category: 'grains' },
+                { name: 'Овес', calories: 389, protein: 17, carbs: 66, fat: 7, category: 'grains' },
+                { name: 'Ячмень', calories: 354, protein: 12, carbs: 73, fat: 2.3, category: 'grains' },
+                { name: 'Хлеб пшеничный', calories: 265, protein: 9, carbs: 49, fat: 3.2, category: 'grains' },
+                { name: 'Хлеб ржаной', calories: 259, protein: 9, carbs: 48, fat: 3.3, category: 'grains' },
+                { name: 'Хлеб бородинский', calories: 208, protein: 6.8, carbs: 40, fat: 1.3, category: 'grains' },
+                { name: 'Хлеб цельнозерновой', calories: 247, protein: 13, carbs: 41, fat: 3.4, category: 'grains' },
+                { name: 'Хлебцы ржаные', calories: 310, protein: 11, carbs: 58, fat: 2.2, category: 'grains' },
+                { name: 'Хлебцы пшеничные', calories: 330, protein: 12, carbs: 65, fat: 2.5, category: 'grains' },
+                { name: 'Сухари пшеничные', calories: 400, protein: 12, carbs: 72, fat: 5, category: 'grains' },
+                { name: 'Сухари ржаные', calories: 380, protein: 13, carbs: 70, fat: 4, category: 'grains' },
+                { name: 'Багет', calories: 262, protein: 8, carbs: 51, fat: 1.5, category: 'grains' },
+                { name: 'Лаваш', calories: 275, protein: 9, carbs: 56, fat: 1.2, category: 'grains' },
+                { name: 'Макароны', calories: 131, protein: 5, carbs: 25, fat: 1, category: 'grains' },
+                { name: 'Макароны из твердых сортов', calories: 350, protein: 13, carbs: 71, fat: 1.5, category: 'grains' },
+                { name: 'Спагетти', calories: 158, protein: 6, carbs: 31, fat: 1, category: 'grains' },
+                { name: 'Вермишель', calories: 370, protein: 12, carbs: 75, fat: 1.5, category: 'grains' },
+                { name: 'Лапша яичная', calories: 384, protein: 15, carbs: 71, fat: 4.4, category: 'grains' },
+                { name: 'Лапша гречневая', calories: 348, protein: 15, carbs: 70, fat: 1, category: 'grains' },
+                { name: 'Лапша рисовая', calories: 364, protein: 4, carbs: 86, fat: 0.6, category: 'grains' },
+                { name: 'Мюсли', calories: 360, protein: 9, carbs: 67, fat: 5, category: 'grains' },
+                { name: 'Гранола', calories: 471, protein: 10, carbs: 64, fat: 20, category: 'grains' },
+                { name: 'Попкорн', calories: 387, protein: 13, carbs: 78, fat: 5, category: 'grains' },
+                { name: 'Кукурузные хлопья', calories: 363, protein: 7, carbs: 83, fat: 0.4, category: 'grains' },
+                { name: 'Пшеничные отруби', calories: 216, protein: 15, carbs: 64, fat: 4.3, category: 'grains' },
+                { name: 'Овсяные отруби', calories: 246, protein: 17, carbs: 66, fat: 7, category: 'grains' },
+                { name: 'Семена чиа', calories: 486, protein: 17, carbs: 42, fat: 31, category: 'grains' },
+                { name: 'Семена льна', calories: 534, protein: 18, carbs: 29, fat: 42, category: 'grains' },
+                { name: 'Семена подсолнечника', calories: 584, protein: 21, carbs: 20, fat: 51, category: 'grains' },
+                { name: 'Семена тыквы', calories: 559, protein: 30, carbs: 11, fat: 49, category: 'grains' },
+                { name: 'Кунжут', calories: 573, protein: 18, carbs: 12, fat: 50, category: 'grains' },
+                { name: 'Мак', calories: 525, protein: 18, carbs: 28, fat: 42, category: 'grains' },
+                
+                                // Молочные продукты (увеличенный список)
+                { name: 'Молоко 3.2%', calories: 60, protein: 3.2, carbs: 4.8, fat: 3.6, category: 'dairy' },
+                { name: 'Молоко 2.5%', calories: 52, protein: 2.9, carbs: 4.8, fat: 2.5, category: 'dairy' },
+                { name: 'Молоко 1.5%', calories: 45, protein: 3, carbs: 4.8, fat: 1.5, category: 'dairy' },
+                { name: 'Молоко обезжиренное', calories: 34, protein: 3.3, carbs: 5, fat: 0.2, category: 'dairy' },
+                { name: 'Молоко козье', calories: 68, protein: 3.6, carbs: 4.5, fat: 4.1, category: 'dairy' },
+                { name: 'Молоко соевое', calories: 54, protein: 3.3, carbs: 6, fat: 1.8, category: 'dairy' },
+                { name: 'Молоко миндальное', calories: 17, protein: 0.6, carbs: 0.6, fat: 1.5, category: 'dairy' },
+                { name: 'Молоко кокосовое', calories: 230, protein: 2.3, carbs: 3.3, fat: 24, category: 'dairy' },
+                { name: 'Кефир 3.2%', calories: 56, protein: 3, carbs: 4, fat: 3.2, category: 'dairy' },
+                { name: 'Кефир 1%', calories: 40, protein: 3, carbs: 4, fat: 1, category: 'dairy' },
+                { name: 'Кефир обезжиренный', calories: 30, protein: 3, carbs: 4, fat: 0.1, category: 'dairy' },
+                { name: 'Ряженка 4%', calories: 67, protein: 2.8, carbs: 4.2, fat: 4, category: 'dairy' },
+                { name: 'Йогурт натуральный 3.2%', calories: 68, protein: 5, carbs: 3.5, fat: 3.2, category: 'dairy' },
+                { name: 'Йогурт питьевой', calories: 72, protein: 3, carbs: 10, fat: 2, category: 'dairy' },
+                { name: 'Йогурт греческий', calories: 59, protein: 10, carbs: 3.6, fat: 0.4, category: 'dairy' },
+                { name: 'Сметана 20%', calories: 206, protein: 2.5, carbs: 3.5, fat: 20, category: 'dairy' },
+                { name: 'Сметана 15%', calories: 162, protein: 2.6, carbs: 3.6, fat: 15, category: 'dairy' },
+                { name: 'Сметана 10%', calories: 115, protein: 3, carbs: 4, fat: 10, category: 'dairy' },
+                { name: 'Сливки 33%', calories: 322, protein: 2.2, carbs: 3.7, fat: 33, category: 'dairy' },
+                { name: 'Сливки 20%', calories: 205, protein: 2.5, carbs: 3.7, fat: 20, category: 'dairy' },
+                { name: 'Сливки 10%', calories: 118, protein: 2.7, carbs: 4.5, fat: 10, category: 'dairy' },
+                { name: 'Творог 9%', calories: 159, protein: 16, carbs: 3, fat: 9, category: 'dairy' },
+                { name: 'Творог 5%', calories: 121, protein: 17, carbs: 3, fat: 5, category: 'dairy' },
+                { name: 'Творог 2%', calories: 103, protein: 18, carbs: 3, fat: 2, category: 'dairy' },
+                { name: 'Творог обезжиренный', calories: 85, protein: 18, carbs: 3.3, fat: 0.6, category: 'dairy' },
+                { name: 'Творог зерненый', calories: 105, protein: 12, carbs: 2, fat: 5, category: 'dairy' },
+                { name: 'Творожная масса', calories: 341, protein: 7, carbs: 30, fat: 22, category: 'dairy' },
+                { name: 'Сыр творожный', calories: 317, protein: 7, carbs: 3, fat: 31, category: 'dairy' },
+                { name: 'Сыр твердый', calories: 350, protein: 25, carbs: 2, fat: 28, category: 'dairy' },
+                { name: 'Сыр плавленый', calories: 305, protein: 16, carbs: 2, fat: 27, category: 'dairy' },
+                { name: 'Сыр моцарелла', calories: 280, protein: 28, carbs: 3, fat: 17, category: 'dairy' },
+                { name: 'Сыр адыгейский', calories: 240, protein: 19, carbs: 2, fat: 18, category: 'dairy' },
+                { name: 'Сыр сулугуни', calories: 290, protein: 20, carbs: 0, fat: 24, category: 'dairy' },
+                { name: 'Сыр брынза', calories: 260, protein: 18, carbs: 0, fat: 21, category: 'dairy' },
+                { name: 'Сыр фета', calories: 264, protein: 14, carbs: 4, fat: 21, category: 'dairy' },
+                { name: 'Сыр пармезан', calories: 431, protein: 38, carbs: 4, fat: 29, category: 'dairy' },
+                { name: 'Сыр чеддер', calories: 404, protein: 23, carbs: 2, fat: 34, category: 'dairy' },
+                { name: 'Сыр гауда', calories: 356, protein: 25, carbs: 2, fat: 27, category: 'dairy' },
+                { name: 'Сыр маасдам', calories: 350, protein: 23, carbs: 0, fat: 28, category: 'dairy' },
+                { name: 'Сыр российский', calories: 364, protein: 23, carbs: 0, fat: 29, category: 'dairy' },
+                { name: 'Сыр голландский', calories: 352, protein: 26, carbs: 0, fat: 27, category: 'dairy' },
+                { name: 'Сыр пошехонский', calories: 344, protein: 26, carbs: 0, fat: 26, category: 'dairy' },
+                { name: 'Сыр колбасный', calories: 275, protein: 21, carbs: 3, fat: 20, category: 'dairy' },
+                { name: 'Сыр косичка', calories: 320, protein: 20, carbs: 2, fat: 26, category: 'dairy' },
+                { name: 'Сыр тофу', calories: 76, protein: 8, carbs: 2, fat: 4.5, category: 'dairy' },
+                { name: 'Сыр с плесенью', calories: 353, protein: 21, carbs: 2, fat: 29, category: 'dairy' },
+                { name: 'Масло сливочное', calories: 717, protein: 0.5, carbs: 0.8, fat: 81, category: 'dairy' },
+                { name: 'Масло топленое', calories: 892, protein: 0.2, carbs: 0, fat: 99, category: 'dairy' },
+                { name: 'Маргарин', calories: 717, protein: 0.2, carbs: 0.7, fat: 80, category: 'dairy' },
+                { name: 'Сгущенное молоко', calories: 320, protein: 7, carbs: 56, fat: 9, category: 'dairy' },
+                { name: 'Сухое молоко', calories: 469, protein: 24, carbs: 39, fat: 25, category: 'dairy' },
+                { name: 'Мороженое пломбир', calories: 227, protein: 3.7, carbs: 20, fat: 15, category: 'dairy' },
+                { name: 'Мороженое сливочное', calories: 207, protein: 3.5, carbs: 24, fat: 11, category: 'dairy' },
+                { name: 'Мороженое шоколадное', calories: 216, protein: 3.8, carbs: 28, fat: 11, category: 'dairy' },
+                { name: 'Мороженое фруктовое', calories: 125, protein: 1.5, carbs: 28, fat: 0.5, category: 'dairy' },
+                { name: 'Сыворотка', calories: 27, protein: 0.8, carbs: 5, fat: 0.2, category: 'dairy' },
+                { name: 'Простокваша', calories: 58, protein: 2.9, carbs: 4.1, fat: 3.2, category: 'dairy' },
+                { name: 'Айран', calories: 26, protein: 1.1, carbs: 2.5, fat: 1.5, category: 'dairy' },
+                { name: 'Тан', calories: 25, protein: 1.1, carbs: 2.5, fat: 1.5, category: 'dairy' },
+                { name: 'Кумыс', calories: 50, protein: 2.1, carbs: 5, fat: 1.9, category: 'dairy' },
+                
+                // Орехи и семена (увеличенный список)
+                { name: 'Грецкий орех', calories: 654, protein: 15, carbs: 14, fat: 65, category: 'nuts' },
+                { name: 'Миндаль', calories: 579, protein: 21, carbs: 22, fat: 50, category: 'nuts' },
+                { name: 'Фундук', calories: 628, protein: 15, carbs: 17, fat: 61, category: 'nuts' },
+                { name: 'Кешью', calories: 553, protein: 18, carbs: 30, fat: 44, category: 'nuts' },
+                { name: 'Арахис', calories: 567, protein: 26, carbs: 16, fat: 49, category: 'nuts' },
+                { name: 'Фисташки', calories: 560, protein: 20, carbs: 27, fat: 45, category: 'nuts' },
+                { name: 'Кедровый орех', calories: 673, protein: 14, carbs: 13, fat: 68, category: 'nuts' },
+                { name: 'Бразильский орех', calories: 659, protein: 14, carbs: 12, fat: 67, category: 'nuts' },
+                { name: 'Пекан', calories: 691, protein: 9, carbs: 14, fat: 72, category: 'nuts' },
+                { name: 'Макадамия', calories: 718, protein: 8, carbs: 14, fat: 76, category: 'nuts' },
+                { name: 'Кокос', calories: 354, protein: 3.3, carbs: 15, fat: 33, category: 'nuts' },
+                { name: 'Кокосовая стружка', calories: 592, protein: 5, carbs: 25, fat: 57, category: 'nuts' },
+                { name: 'Каштан', calories: 213, protein: 2.4, carbs: 46, fat: 2.3, category: 'nuts' },
+                { name: 'Желудь', calories: 387, protein: 6, carbs: 41, fat: 24, category: 'nuts' },
+                { name: 'Семена подсолнечника', calories: 584, protein: 21, carbs: 20, fat: 51, category: 'nuts' },
+                { name: 'Семена тыквы', calories: 559, protein: 30, carbs: 11, fat: 49, category: 'nuts' },
+                { name: 'Семена льна', calories: 534, protein: 18, carbs: 29, fat: 42, category: 'nuts' },
+                { name: 'Семена чиа', calories: 486, protein: 17, carbs: 42, fat: 31, category: 'nuts' },
+                { name: 'Семена кунжута', calories: 573, protein: 18, carbs: 12, fat: 50, category: 'nuts' },
+                { name: 'Семена мака', calories: 525, protein: 18, carbs: 28, fat: 42, category: 'nuts' },
+                { name: 'Кунжутная паста', calories: 593, protein: 17, carbs: 12, fat: 53, category: 'nuts' },
+                { name: 'Арахисовая паста', calories: 588, protein: 25, carbs: 20, fat: 50, category: 'nuts' },
+                { name: 'Миндальная паста', calories: 614, protein: 21, carbs: 19, fat: 56, category: 'nuts' },
+                { name: 'Фундучная паста', calories: 629, protein: 15, carbs: 17, fat: 62, category: 'nuts' },
+                { name: 'Урбеч из льна', calories: 534, protein: 18, carbs: 29, fat: 42, category: 'nuts' },
+                { name: 'Урбеч из кунжута', calories: 573, protein: 18, carbs: 12, fat: 50, category: 'nuts' },
+                { name: 'Урбеч из подсолнечника', calories: 584, protein: 21, carbs: 20, fat: 51, category: 'nuts' },
+                { name: 'Урбеч из тыквенных семечек', calories: 559, protein: 30, carbs: 11, fat: 49, category: 'nuts' },
+                
+                // Напитки (увеличенный список)
+                { name: 'Вода', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Чай черный', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Чай зеленый', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Чай травяной', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Кофе черный', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Кофе с молоком', calories: 37, protein: 1.5, carbs: 4, fat: 1.5, category: 'beverages' },
+                { name: 'Кофе латте', calories: 93, protein: 4, carbs: 9, fat: 4, category: 'beverages' },
+                { name: 'Кофе капучино', calories: 75, protein: 3, carbs: 8, fat: 3, category: 'beverages' },
+                { name: 'Эспрессо', calories: 3, protein: 0.2, carbs: 0.3, fat: 0.1, category: 'beverages' },
+                { name: 'Американо', calories: 3, protein: 0.2, carbs: 0.3, fat: 0.1, category: 'beverages' },
+                { name: 'Какао', calories: 81, protein: 3.5, carbs: 12, fat: 2.5, category: 'beverages' },
+                { name: 'Горячий шоколад', calories: 89, protein: 3, carbs: 15, fat: 2.5, category: 'beverages' },
+                { name: 'Сок яблочный', calories: 46, protein: 0.1, carbs: 11, fat: 0.1, category: 'beverages' },
+                { name: 'Сок апельсиновый', calories: 45, protein: 0.7, carbs: 10, fat: 0.2, category: 'beverages' },
+                { name: 'Сок виноградный', calories: 70, protein: 0.3, carbs: 17, fat: 0.1, category: 'beverages' },
+                { name: 'Сок гранатовый', calories: 64, protein: 0.3, carbs: 16, fat: 0.1, category: 'beverages' },
+                { name: 'Сок томатный', calories: 17, protein: 0.9, carbs: 3.5, fat: 0.1, category: 'beverages' },
+                { name: 'Сок морковный', calories: 40, protein: 0.9, carbs: 9.3, fat: 0.2, category: 'beverages' },
+                { name: 'Сок свекольный', calories: 61, protein: 1, carbs: 14, fat: 0.2, category: 'beverages' },
+                { name: 'Сок грейпфрутовый', calories: 38, protein: 0.5, carbs: 9, fat: 0.1, category: 'beverages' },
+                { name: 'Сок ананасовый', calories: 53, protein: 0.4, carbs: 13, fat: 0.1, category: 'beverages' },
+                { name: 'Сок вишневый', calories: 50, protein: 0.7, carbs: 12, fat: 0.3, category: 'beverages' },
+                { name: 'Сок персиковый', calories: 57, protein: 0.5, carbs: 14, fat: 0.1, category: 'beverages' },
+                { name: 'Сок мультифрукт', calories: 48, protein: 0.4, carbs: 11, fat: 0.1, category: 'beverages' },
+                { name: 'Компот из сухофруктов', calories: 60, protein: 0.3, carbs: 15, fat: 0, category: 'beverages' },
+                { name: 'Компот из свежих фруктов', calories: 50, protein: 0.3, carbs: 12, fat: 0, category: 'beverages' },
+                { name: 'Морс клюквенный', calories: 40, protein: 0.2, carbs: 10, fat: 0, category: 'beverages' },
+                { name: 'Морс брусничный', calories: 42, protein: 0.2, carbs: 10, fat: 0, category: 'beverages' },
+                { name: 'Кисель', calories: 55, protein: 0.2, carbs: 13, fat: 0.1, category: 'beverages' },
+                { name: 'Лимонад', calories: 40, protein: 0, carbs: 10, fat: 0, category: 'beverages' },
+                { name: 'Квас', calories: 27, protein: 0.2, carbs: 5.2, fat: 0, category: 'beverages' },
+                { name: 'Пиво светлое', calories: 42, protein: 0.5, carbs: 3.5, fat: 0, category: 'beverages' },
+                { name: 'Пиво темное', calories: 48, protein: 0.6, carbs: 5, fat: 0, category: 'beverages' },
+                { name: 'Вино красное сухое', calories: 68, protein: 0.2, carbs: 2.5, fat: 0, category: 'beverages' },
+                { name: 'Вино белое сухое', calories: 66, protein: 0.1, carbs: 2.5, fat: 0, category: 'beverages' },
+                { name: 'Вино красное полусладкое', calories: 88, protein: 0.2, carbs: 5, fat: 0, category: 'beverades' },
+                { name: 'Вино белое полусладкое', calories: 86, protein: 0.1, carbs: 5, fat: 0, category: 'beverades' },
+                { name: 'Шампанское', calories: 85, protein: 0.2, carbs: 5, fat: 0, category: 'beverades' },
+                { name: 'Водка', calories: 235, protein: 0, carbs: 0, fat: 0, category: 'beverades' },
+                { name: 'Коньяк', calories: 239, protein: 0, carbs: 0.5, fat: 0, category: 'beverades' },
+                { name: 'Виски', calories: 250, protein: 0, carbs: 0, fat: 0, category: 'beverades' },
+                { name: 'Ром', calories: 231, protein: 0, carbs: 0, fat: 0, category: 'beverades' },
+                { name: 'Джин', calories: 263, protein: 0, carbs: 0, fat: 0, category: 'beverades' },
+                { name: 'Текила', calories: 231, protein: 0, carbs: 0, fat: 0, category: 'beverades' },
+                { name: 'Ликер', calories: 327, protein: 0.3, carbs: 45, fat: 0.3, category: 'beverades' },
+                { name: 'Кока-кола', calories: 42, protein: 0, carbs: 10.6, fat: 0, category: 'beverages' },
+                { name: 'Пепси', calories: 43, protein: 0, carbs: 10.9, fat: 0, category: 'beverages' },
+                { name: 'Спрайт', calories: 40, protein: 0, carbs: 10, fat: 0, category: 'beverages' },
+                { name: 'Фанта', calories: 41, protein: 0, carbs: 10.4, fat: 0, category: 'beverages' },
+                { name: 'Минеральная вода', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'beverages' },
+                { name: 'Энергетик', calories: 45, protein: 0, carbs: 11, fat: 0, category: 'beverages' },
+                { name: 'Смузи фруктовый', calories: 60, protein: 0.8, carbs: 14, fat: 0.3, category: 'beverages' },
+                { name: 'Смузи овощной', calories: 35, protein: 1.2, carbs: 7, fat: 0.2, category: 'beverages' },
+                { name: 'Молочный коктейль', calories: 150, protein: 4, carbs: 25, fat: 4, category: 'beverages' },
+                
+                // Сладости и десерты (увеличенный список)
+                { name: 'Шоколад молочный', calories: 546, protein: 7, carbs: 54, fat: 31, category: 'sweets' },
+                { name: 'Шоколад горький', calories: 539, protein: 6, carbs: 45, fat: 35, category: 'sweets' },
+                { name: 'Шоколад белый', calories: 541, protein: 4, carbs: 59, fat: 32, category: 'sweets' },
+                { name: 'Шоколад пористый', calories: 522, protein: 6, carbs: 57, fat: 30, category: 'sweets' },
+                { name: 'Конфеты шоколадные', calories: 560, protein: 5, carbs: 55, fat: 35, category: 'sweets' },
+                { name: 'Конфеты карамель', calories: 382, protein: 0, carbs: 94, fat: 0.2, category: 'sweets' },
+                { name: 'Конфеты леденцы', calories: 395, protein: 0, carbs: 98, fat: 0.2, category: 'sweets' },
+                { name: 'Конфеты мармеладные', calories: 340, protein: 0.1, carbs: 80, fat: 0.1, category: 'sweets' },
+                { name: 'Конфеты желейные', calories: 320, protein: 0.2, carbs: 78, fat: 0.1, category: 'sweets' },
+                { name: 'Конфеты грильяж', calories: 420, protein: 3, carbs: 70, fat: 15, category: 'sweets' },
+                { name: 'Конфеты пралине', calories: 530, protein: 7, carbs: 45, fat: 35, category: 'sweets' },
+                { name: 'Печенье овсяное', calories: 437, protein: 6, carbs: 76, fat: 14, category: 'sweets' },
+                { name: 'Печенье песочное', calories: 417, protein: 6, carbs: 76, fat: 10, category: 'sweets' },
+                { name: 'Печенье шоколадное', calories: 480, protein: 5, carbs: 65, fat: 22, category: 'sweets' },
+                { name: 'Печенье галетное', calories: 390, protein: 9, carbs: 76, fat: 5, category: 'sweets' },
+                { name: 'Пряники', calories: 350, protein: 5, carbs: 75, fat: 3, category: 'sweets' },
+                { name: 'Вафли', calories: 425, protein: 4, carbs: 70, fat: 15, category: 'sweets' },
+                { name: 'Крекеры', calories: 445, protein: 9, carbs: 68, fat: 16, category: 'sweets' },
+                { name: 'Сушки', calories: 340, protein: 11, carbs: 70, fat: 1, category: 'sweets' },
+                { name: 'Баранки', calories: 330, protein: 10, carbs: 68, fat: 1.5, category: 'sweets' },
+                { name: 'Бублики', calories: 270, protein: 11, carbs: 52, fat: 1.5, category: 'sweets' },
+                { name: 'Торт бисквитный', calories: 350, protein: 5, carbs: 45, fat: 16, category: 'sweets' },
+                { name: 'Торт песочный', calories: 410, protein: 6, carbs: 50, fat: 20, category: 'sweets' },
+                { name: 'Торт шоколадный', calories: 380, protein: 5, carbs: 48, fat: 19, category: 'sweets' },
+                { name: 'Торт медовый', calories: 370, protein: 5, carbs: 55, fat: 15, category: 'sweets' },
+                { name: 'Торт наполеон', calories: 450, protein: 6, carbs: 40, fat: 30, category: 'sweets' },
+                { name: 'Торт птичье молоко', calories: 320, protein: 5, carbs: 45, fat: 14, category: 'sweets' },
+                { name: 'Торт чизкейк', calories: 320, protein: 6, carbs: 30, fat: 20, category: 'sweets' },
+                { name: 'Торт морковный', calories: 280, protein: 4, carbs: 40, fat: 12, category: 'sweets' },
+                { name: 'Пирожное эклер', calories: 340, protein: 5, carbs: 35, fat: 20, category: 'sweets' },
+                { name: 'Пирожное картошка', calories: 380, protein: 5, carbs: 45, fat: 20, category: 'sweets' },
+                { name: 'Пирожное безе', calories: 290, protein: 3, carbs: 70, fat: 0.2, category: 'sweets' },
+                { name: 'Пирожное корзиночка', calories: 400, protein: 5, carbs: 45, fat: 22, category: 'sweets' },
+                { name: 'Пирожное трубочка', calories: 370, protein: 4, carbs: 48, fat: 19, category: 'sweets' },
+                { name: 'Пирожное песочное', calories: 420, protein: 6, carbs: 55, fat: 20, category: 'sweets' },
+                { name: 'Пирожное бисквитное', calories: 350, protein: 5, carbs: 50, fat: 15, category: 'sweets' },
+                { name: 'Пирожное заварное', calories: 280, protein: 5, carbs: 30, fat: 15, category: 'sweets' },
+                { name: 'Пирожное слоеное', calories: 450, protein: 6, carbs: 40, fat: 30, category: 'sweets' },
+                { name: 'Пирог яблочный', calories: 260, protein: 3, carbs: 40, fat: 10, category: 'sweets' },
+                { name: 'Пирог вишневый', calories: 270, protein: 3, carbs: 42, fat: 10, category: 'sweets' },
+                { name: 'Пирог с мясом', calories: 280, protein: 8, carbs: 30, fat: 14, category: 'sweets' },
+                { name: 'Пирог с капустой', calories: 220, protein: 5, carbs: 35, fat: 7, category: 'sweets' },
+                { name: 'Пирог с картошкой', calories: 250, protein: 5, carbs: 35, fat: 10, category: 'sweets' },
+                { name: 'Пирог с рыбой', calories: 240, protein: 9, carbs: 28, fat: 10, category: 'sweets' },
+                { name: 'Пирог с грибами', calories: 230, protein: 6, carbs: 30, fat: 9, category: 'sweets' },
+                { name: 'Блинчики', calories: 230, protein: 6, carbs: 30, fat: 9, category: 'sweets' },
+                { name: 'Оладьи', calories: 250, protein: 6, carbs: 35, fat: 10, category: 'sweets' },
+                { name: 'Сырники', calories: 220, protein: 15, carbs: 20, fat: 10, category: 'sweets' },
+                { name: 'Вареники с творогом', calories: 200, protein: 10, carbs: 30, fat: 5, category: 'sweets' },
+                { name: 'Вареники с картошкой', calories: 180, protein: 5, carbs: 35, fat: 4, category: 'sweets' },
+                { name: 'Вареники с вишней', calories: 190, protein: 4, carbs: 38, fat: 3, category: 'sweets' },
+                { name: 'Пончики', calories: 340, protein: 6, carbs: 40, fat: 18, category: 'sweets' },
+                { name: 'Пряники', calories: 350, protein: 5, carbs: 75, fat: 3, category: 'sweets' },
+                { name: 'Халва подсолнечная', calories: 523, protein: 12, carbs: 54, fat: 30, category: 'sweets' },
+                { name: 'Халва арахисовая', calories: 502, protein: 15, carbs: 43, fat: 33, category: 'sweets' },
+                { name: 'Халва тахинная', calories: 510, protein: 13, carbs: 51, fat: 30, category: 'sweets' },
+                { name: 'Зефир', calories: 304, protein: 0.8, carbs: 80, fat: 0, category: 'sweets' },
+                { name: 'Пастила', calories: 310, protein: 0.5, carbs: 80, fat: 0, category: 'sweets' },
+                { name: 'Мармелад', calories: 290, protein: 0.1, carbs: 76, fat: 0.1, category: 'sweets' },
+                { name: 'Желе', calories: 62, protein: 2, carbs: 14, fat: 0.1, category: 'sweets' },
+                { name: 'Пудинг', calories: 150, protein: 3, carbs: 25, fat: 4, category: 'sweets' },
+                { name: 'Суфле', calories: 180, protein: 5, carbs: 30, fat: 5, category: 'sweets' },
+                { name: 'Мед', calories: 304, protein: 0.3, carbs: 82, fat: 0, category: 'sweets' },
+                { name: 'Варенье', calories: 265, protein: 0.3, carbs: 70, fat: 0.1, category: 'sweets' },
+                { name: 'Джем', calories: 250, protein: 0.4, carbs: 65, fat: 0.1, category: 'sweets' },
+                { name: 'Повидло', calories: 240, protein: 0.5, carbs: 62, fat: 0.2, category: 'sweets' },
+                { name: 'Сгущенное молоко', calories: 320, protein: 7, carbs: 56, fat: 9, category: 'sweets' },
+                { name: 'Сгущенка вареная', calories: 330, protein: 7, carbs: 57, fat: 9, category: 'sweets' },
+                { name: 'Кленовый сироп', calories: 260, protein: 0, carbs: 67, fat: 0.1, category: 'sweets' },
+                { name: 'Сироп топинамбура', calories: 267, protein: 0, carbs: 70, fat: 0, category: 'sweets' },
+                { name: 'Агаровый сироп', calories: 280, protein: 0, carbs: 72, fat: 0, category: 'sweets' },
+                { name: 'Карамельный сироп', calories: 290, protein: 0, carbs: 75, fat: 0, category: 'sweets' },
+                { name: 'Шоколадный сироп', calories: 270, protein: 2, carbs: 65, fat: 2, category: 'sweets' },
+                { name: 'Фруктовый сироп', calories: 250, protein: 0, carbs: 65, fat: 0, category: 'sweets' },
+                { name: 'Мороженое пломбир', calories: 227, protein: 3.7, carbs: 20, fat: 15, category: 'sweets' },
+                { name: 'Мороженое сливочное', calories: 207, protein: 3.5, carbs: 24, fat: 11, category: 'sweets' },
+                { name: 'Мороженое шоколадное', calories: 216, protein: 3.8, carbs: 28, fat: 11, category: 'sweets' },
+                { name: 'Мороженое фруктовое', calories: 125, protein: 1.5, carbs: 28, fat: 0.5, category: 'sweets' },
+                { name: 'Щербет', calories: 140, protein: 1, carbs: 30, fat: 1, category: 'sweets' },
+                { name: 'Сорбет', calories: 120, protein: 0.5, carbs: 30, fat: 0.2, category: 'sweets' },
+                { name: 'Пломбир в шоколаде', calories: 280, protein: 4, carbs: 25, fat: 18, category: 'sweets' },
+                { name: 'Эскимо', calories: 270, protein: 4, carbs: 25, fat: 17, category: 'sweets' },
+
+                { name: 'Биг Мак', calories: 503, protein: 26, carbs: 42, fat: 26, category: 'fastfood' },
+                { name: 'Чизбургер', calories: 303, protein: 15, carbs: 33, fat: 13, category: 'fastfood' },
+                { name: 'Чикен Макнаггетс (6 шт)', calories: 250, protein: 14, carbs: 15, fat: 16, category: 'fastfood' },
+                { name: 'Картофель Фри (средняя порция)', calories: 340, protein: 4, carbs: 44, fat: 16, category: 'fastfood' },
+                { name: 'Филе-о-Фиш', calories: 330, protein: 14, carbs: 39, fat: 14, category: 'fastfood' },
+                { name: 'Макчикен', calories: 355, protein: 15, carbs: 38, fat: 16, category: 'fastfood' },
+                { name: 'Двойной Чизбургер', calories: 437, protein: 25, carbs: 33, fat: 24, category: 'fastfood' },
+                { name: 'Биг Тейсти', calories: 493, protein: 26, carbs: 41, fat: 25, category: 'fastfood' },
+                { name: 'Чикенбургер', calories: 265, protein: 13, carbs: 30, fat: 11, category: 'fastfood' },
+                { name: 'Гамбургер', calories: 251, protein: 12, carbs: 31, fat: 9, category: 'fastfood' },
+                { name: 'Роял Чизбургер', calories: 515, protein: 28, carbs: 38, fat: 28, category: 'fastfood' },
+                { name: 'Роял Де Люкс', calories: 585, protein: 30, carbs: 43, fat: 32, category: 'fastfood' },
+                { name: 'Твистер Оригинальный', calories: 470, protein: 21, carbs: 48, fat: 22, category: 'fastfood' },
+                { name: 'Твистер Чиз', calories: 510, protein: 24, carbs: 48, fat: 25, category: 'fastfood' },
+                { name: 'Боксмастер Оригинальный', calories: 545, protein: 26, carbs: 44, fat: 30, category: 'fastfood' },
+                { name: 'Боксмастер Чиз', calories: 585, protein: 29, carbs: 44, fat: 33, category: 'fastfood' },
+                { name: 'Стрипсы (3 шт)', calories: 270, protein: 18, carbs: 17, fat: 15, category: 'fastfood' },
+                { name: 'Крылышки Баффало (5 шт)', calories: 320, protein: 24, carbs: 12, fat: 21, category: 'fastfood' },
+                { name: 'Цезарь Ролл', calories: 480, protein: 22, carbs: 46, fat: 24, category: 'fastfood' },
+                { name: 'Лонгер Чикен', calories: 425, protein: 19, carbs: 45, fat: 20, category: 'fastfood' },
+                { name: 'Лонгер Чиз', calories: 465, protein: 22, carbs: 45, fat: 23, category: 'fastfood' },
+                { name: 'Чикен Попперс (5 шт)', calories: 280, protein: 12, carbs: 25, fat: 15, category: 'fastfood' },
+                { name: 'Картофель по-деревенски (средняя порция)', calories: 315, protein: 5, carbs: 38, fat: 16, category: 'fastfood' },
+                { name: 'Whopper', calories: 660, protein: 28, carbs: 49, fat: 40, category: 'fastfood' },
+                { name: 'Whopper с сыром', calories: 710, protein: 31, carbs: 50, fat: 44, category: 'fastfood' },
+                { name: 'Чизбургер BK', calories: 280, protein: 15, carbs: 27, fat: 14, category: 'fastfood' },
+                { name: 'Бекон Кинг', calories: 530, protein: 27, carbs: 34, fat: 32, category: 'fastfood' },
+                { name: 'Чикен Кинг', calories: 580, protein: 26, carbs: 54, fat: 29, category: 'fastfood' },
+                { name: 'Лонг Чикен', calories: 470, protein: 21, carbs: 49, fat: 22, category: 'fastfood' },
+                { name: 'Наггетсы (6 шт)', calories: 270, protein: 14, carbs: 16, fat: 17, category: 'fastfood' },
+                { name: 'Шаурма классическая', calories: 450, protein: 20, carbs: 45, fat: 22, category: 'fastfood' },
+                { name: 'Шаурма острая', calories: 470, protein: 21, carbs: 46, fat: 23, category: 'fastfood' },
+                { name: 'Шаурма с сыром', calories: 520, protein: 23, carbs: 46, fat: 27, category: 'fastfood' },
+                { name: 'Донер кебаб', calories: 480, protein: 25, carbs: 40, fat: 25, category: 'fastfood' },
+                { name: 'Фалафель в лаваше', calories: 420, protein: 12, carbs: 60, fat: 15, category: 'fastfood' },
+                { name: 'Хот-дог классический', calories: 290, protein: 10, carbs: 25, fat: 17, category: 'fastfood' },
+                { name: 'Хот-дог с сыром и беконом', calories: 380, protein: 14, carbs: 26, fat: 25, category: 'fastfood' },
+                { name: 'Пицца Маргарита (кусок)', calories: 210, protein: 8, carbs: 28, fat: 7, category: 'fastfood' },
+                { name: 'Пицца Пепперони (кусок)', calories: 290, protein: 12, carbs: 29, fat: 14, category: 'fastfood' },
+                { name: 'Пицца Гавайская (кусок)', calories: 250, protein: 10, carbs: 30, fat: 10, category: 'fastfood' },
+                { name: 'Пицца 4 сыра (кусок)', calories: 310, protein: 13, carbs: 28, fat: 16, category: 'fastfood' },
+                { name: 'Пицца Мясная (кусок)', calories: 330, protein: 16, carbs: 28, fat: 18, category: 'fastfood' },
+                { name: 'Кальцоне с ветчиной и сыром', calories: 480, protein: 22, carbs: 45, fat: 25, category: 'fastfood' },
+                { name: 'Чизкейк Нью-Йорк (кусок)', calories: 350, protein: 6, carbs: 35, fat: 22, category: 'fastfood' },
+                { name: 'Чизкейк Клубничный (кусок)', calories: 330, protein: 5, carbs: 38, fat: 19, category: 'fastfood' },
+                { name: 'Буррито с говядиной', calories: 420, protein: 18, carbs: 50, fat: 17, category: 'fastfood' },
+                { name: 'Буррито с курицей', calories: 380, protein: 20, carbs: 48, fat: 14, category: 'fastfood' },
+                { name: 'Буррито с овощами', calories: 320, protein: 9, carbs: 55, fat: 8, category: 'fastfood' },
+                { name: 'Кесадилья с курицей', calories: 450, protein: 25, carbs: 35, fat: 22, category: 'fastfood' },
+                { name: 'Кесадилья с сыром', calories: 380, protein: 18, carbs: 32, fat: 20, category: 'fastfood' },
+                { name: 'Начос с сыром (порция)', calories: 350, protein: 10, carbs: 35, fat: 20, category: 'fastfood' },
+                { name: 'Начос с чили (порция)', calories: 400, protein: 15, carbs: 36, fat: 22, category: 'fastfood' },
+                { name: 'Такос с курицей (1 шт)', calories: 180, protein: 9, carbs: 18, fat: 8, category: 'fastfood' },
+                { name: 'Такос с говядиной (1 шт)', calories: 200, protein: 10, carbs: 17, fat: 10, category: 'fastfood' },
+                { name: 'Гуакамоле (порция)', calories: 150, protein: 2, carbs: 8, fat: 13, category: 'fastfood' },
+                { name: 'Сальса (порция)', calories: 20, protein: 1, carbs: 4, fat: 0, category: 'fastfood' },
+                { name: 'Сырный соус (порция)', calories: 120, protein: 3, carbs: 2, fat: 12, category: 'fastfood' },
+                { name: 'Сметанный соус (порция)', calories: 110, protein: 2, carbs: 3, fat: 11, category: 'fastfood' },
+                { name: 'Корн-дог (1 шт)', calories: 280, protein: 8, carbs: 30, fat: 14, category: 'fastfood' },
+                { name: 'Луковые кольца (порция)', calories: 400, protein: 5, carbs: 40, fat: 24, category: 'fastfood' },
+                { name: 'Чили-дог', calories: 320, protein: 12, carbs: 28, fat: 18, category: 'fastfood' },
+                { name: 'Чиз-дог', calories: 310, protein: 11, carbs: 27, fat: 17, category: 'fastfood' },
+                { name: 'Кроquetas de jamón (4 шт)', calories: 280, protein: 10, carbs: 20, fat: 18, category: 'fastfood' },
+                { name: 'Эмпанадас с мясом (2 шт)', calories: 340, protein: 14, carbs: 32, fat: 18, category: 'fastfood' },
+                { name: 'Самса с бараниной (2 шт)', calories: 380, protein: 16, carbs: 35, fat: 20, category: 'fastfood' },
+                { name: 'Чебурек (1 шт)', calories: 350, protein: 12, carbs: 30, fat: 20, category: 'fastfood' },
+                { name: 'Беляш (1 шт)', calories: 280, protein: 11, carbs: 25, fat: 15, category: 'fastfood' },
+                { name: 'Пирожок с мясом (жареный)', calories: 250, protein: 8, carbs: 25, fat: 14, category: 'fastfood' },
+                { name: 'Пирожок с картошкой (жареный)', calories: 220, protein: 5, carbs: 28, fat: 10, category: 'fastfood' },
+                { name: 'Пирожок с капустой (жареный)', calories: 200, protein: 4, carbs: 26, fat: 9, category: 'fastfood' },
+                { name: 'Ватрушка с творогом', calories: 280, protein: 8, carbs: 35, fat: 12, category: 'fastfood' },
+                { name: 'Хачапури по-аджарски', calories: 550, protein: 20, carbs: 50, fat: 30, category: 'fastfood' },
+                { name: 'Хот-дог в тесте', calories: 300, protein: 9, carbs: 32, fat: 16, category: 'fastfood' },
+                { name: 'Куриная грудка в кляре', calories: 320, protein: 25, carbs: 15, fat: 18, category: 'fastfood' },
+                { name: 'Куриные крылья в соусе терияки', calories: 350, protein: 20, carbs: 20, fat: 20, category: 'fastfood' },
+                { name: 'Куриные крылья барбекю', calories: 380, protein: 22, carbs: 18, fat: 24, category: 'fastfood' },
+                { name: 'Молочный коктейль ванильный', calories: 350, protein: 8, carbs: 55, fat: 12, category: 'fastfood' },
+                { name: 'Молочный коктейль шоколадный', calories: 380, protein: 9, carbs: 60, fat: 13, category: 'fastfood' },
+                { name: 'Молочный коктейль клубничный', calories: 360, protein: 8, carbs: 58, fat: 12, category: 'fastfood' },
+                { name: 'Кока-Кола (0.5л)', calories: 210, protein: 0, carbs: 53, fat: 0, category: 'fastfood' },
+                { name: 'Спрайт (0.5л)', calories: 200, protein: 0, carbs: 51, fat: 0, category: 'fastfood' },
+                { name: 'Фанта (0.5л)', calories: 220, protein: 0, carbs: 55, fat: 0, category: 'fastfood' },
+                { name: 'Айс Ти (0.5л)', calories: 150, protein: 0, carbs: 38, fat: 0, category: 'fastfood' },
+                { name: 'Латте (стандартный стакан)', calories: 180, protein: 9, carbs: 18, fat: 8, category: 'fastfood' },
+                { name: 'Капучино (стандартный стакан)', calories: 120, protein: 6, carbs: 12, fat: 5, category: 'fastfood' },
+                { name: 'Американо (стандартный стакан)', calories: 5, protein: 0, carbs: 1, fat: 0, category: 'fastfood' },
+                { name: 'Эспрессо (стандартная порция)', calories: 3, protein: 0, carbs: 0, fat: 0, category: 'fastfood' },
+                { name: 'Мороженое ванильное (шарик)', calories: 140, protein: 3, carbs: 18, fat: 7, category: 'fastfood' },
+                { name: 'Мороженое шоколадное (шарик)', calories: 150, protein: 3, carbs: 20, fat: 7, category: 'fastfood' },
+                { name: 'Мороженое клубничное (шарик)', calories: 130, protein: 2, carbs: 19, fat: 5, category: 'fastfood' },
+                { name: 'Яблочный пирог (кусок)', calories: 280, protein: 3, carbs: 40, fat: 12, category: 'fastfood' },
+                { name: 'Вишневый пирог (кусок)', calories: 270, protein: 3, carbs: 38, fat: 12, category: 'fastfood' },
+                { name: 'Пончик глазированный', calories: 250, protein: 3, carbs: 35, fat: 12, category: 'fastfood' },
+                { name: 'Пончик с шоколадной глазурью', calories: 270, protein: 4, carbs: 37, fat: 13, category: 'fastfood' },
+                { name: 'Пончик с вареньем', calories: 290, protein: 4, carbs: 40, fat: 13, category: 'fastfood' },
+                { name: 'Маффин шоколадный', calories: 420, protein: 6, carbs: 55, fat: 20, category: 'fastfood' },
+                { name: 'Маффин с черникой', calories: 380, protein: 5, carbs: 50, fat: 18, category: 'fastfood' },
+                { name: 'Печенье овсяное с изюмом', calories: 150, protein: 2, carbs: 25, fat: 5, category: 'fastfood' },
+                { name: 'Шоколадное печенье', calories: 180, protein: 2, carbs: 25, fat: 8, category: 'fastfood' },
+                { name: 'Брауни', calories: 350, protein: 4, carbs: 45, fat: 18, category: 'fastfood' },
+                
+                // Прочее (увеличенный список)
+                { name: 'Яйцо куриное', calories: 157, protein: 12.7, carbs: 0.7, fat: 11.5, category: 'other' },
+                { name: 'Яйцо перепелиное', calories: 168, protein: 11.9, carbs: 0.6, fat: 13.1, category: 'other' },
+                { name: 'Яичный белок', calories: 52, protein: 11, carbs: 0.7, fat: 0.2, category: 'other' },
+                { name: 'Яичный желток', calories: 322, protein: 16, carbs: 1.8, fat: 27, category: 'other' },
+                { name: 'Майонез', calories: 680, protein: 1, carbs: 2.6, fat: 72, category: 'other' },
+                { name: 'Майонез легкий', calories: 350, protein: 0.5, carbs: 5, fat: 35, category: 'other' },
+                { name: 'Горчица', calories: 162, protein: 5, carbs: 12, fat: 11, category: 'other' },
+                { name: 'Кетчуп', calories: 101, protein: 1.7, carbs: 25, fat: 0.3, category: 'other' },
+                { name: 'Соус соевый', calories: 53, protein: 6, carbs: 5, fat: 0, category: 'other' },
+                { name: 'Соус тартар', calories: 380, protein: 1, carbs: 5, fat: 40, category: 'other' },
+                { name: 'Соус барбекю', calories: 120, protein: 0.8, carbs: 25, fat: 0.5, category: 'other' },
+                { name: 'Соус чили', calories: 80, protein: 1, carbs: 18, fat: 0.5, category: 'other' },
+                { name: 'Соус терияки', calories: 89, protein: 3, carbs: 16, fat: 0.9, category: 'other' },
+                { name: 'Соус цезарь', calories: 390, protein: 2, carbs: 5, fat: 40, category: 'other' },
+                { name: 'Хрен', calories: 56, protein: 2.2, carbs: 12, fat: 0.4, category: 'other' },
+                { name: 'Аджика', calories: 60, protein: 1, carbs: 10, fat: 1.5, category: 'other' },
+                { name: 'Масло подсолнечное', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Масло оливковое', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Масло кукурузное', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Масло льняное', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Масло кунжутное', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Масло кокосовое', calories: 862, protein: 0, carbs: 0, fat: 100, category: 'other' },
+                { name: 'Масло сливочное', calories: 717, protein: 0.5, carbs: 0.8, fat: 81, category: 'other' },
+                { name: 'Масло топленое', calories: 892, protein: 0.2, carbs: 0, fat: 99, category: 'other' },
+                { name: 'Маргарин', calories: 717, protein: 0.2, carbs: 0.7, fat: 80, category: 'other' },
+                { name: 'Специи', calories: 250, protein: 10, carbs: 40, fat: 5, category: 'other' },
+                { name: 'Соль', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'other' },
+                { name: 'Сахар', calories: 387, protein: 0, carbs: 100, fat: 0, category: 'other' },
+                { name: 'Сахар тростниковый', calories: 387, protein: 0, carbs: 100, fat: 0, category: 'other' },
+                { name: 'Мед', calories: 304, protein: 0.3, carbs: 82, fat: 0, category: 'other' },
+                { name: 'Варенье', calories: 265, protein: 0.3, carbs: 70, fat: 0.1, category: 'other' },
+                { name: 'Джем', calories: 250, protein: 0.4, carbs: 65, fat: 0.1, category: 'other' },
+                { name: 'Повидло', calories: 240, protein: 0.5, carbs: 62, fat: 0.2, category: 'other' },
+                { name: 'Сироп кленовый', calories: 260, protein: 0, carbs: 67, fat: 0.1, category: 'other' },
+                { name: 'Патока', calories: 300, protein: 0, carbs: 78, fat: 0, category: 'other' },
+                { name: 'Фруктоза', calories: 400, protein: 0, carbs: 100, fat: 0, category: 'other' },
+                { name: 'Сорбит', calories: 354, protein: 0, carbs: 91, fat: 0, category: 'other' },
+                { name: 'Ксилит', calories: 367, protein: 0, carbs: 100, fat: 0, category: 'other' },
+                { name: 'Стевия', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'other' },
+                { name: 'Аспартам', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'other' },
+                { name: 'Уксус столовый', calories: 18, protein: 0, carbs: 5, fat: 0, category: 'other' },
+                { name: 'Уксус яблочный', calories: 21, protein: 0, carbs: 6, fat: 0, category: 'other' },
+                { name: 'Уксус бальзамический', calories: 88, protein: 0.5, carbs: 17, fat: 0, category: 'other' },
+                { name: 'Желатин', calories: 335, protein: 85, carbs: 0, fat: 0.1, category: 'other' },
+                { name: 'Агар-агар', calories: 306, protein: 4, carbs: 77, fat: 0, category: 'other' },
+                { name: 'Дрожжи сухие', calories: 325, protein: 40, carbs: 41, fat: 6, category: 'other' },
+                { name: 'Дрожжи свежие', calories: 109, protein: 12, carbs: 18, fat: 2, category: 'other' },
+                { name: 'Разрыхлитель', calories: 79, protein: 0.1, carbs: 19, fat: 0, category: 'other' },
+                { name: 'Сода пищевая', calories: 0, protein: 0, carbs: 0, fat: 0, category: 'other' },
+                { name: 'Ванилин', calories: 288, protein: 0.1, carbs: 13, fat: 0.1, category: 'other' },
+                { name: 'Корица', calories: 247, protein: 4, carbs: 81, fat: 1.2, category: 'other' },
+                { name: 'Имбирь молотый', calories: 335, protein: 9, carbs: 72, fat: 4.2, category: 'other' },
+                { name: 'Куркума', calories: 354, protein: 7.8, carbs: 65, fat: 9.9, category: 'other' },
+                { name: 'Перец черный', calories: 255, protein: 11, carbs: 64, fat: 3.3, category: 'other' },
+                { name: 'Перец красный', calories: 318, protein: 12, carbs: 57, fat: 17, category: 'other' },
+                { name: 'Паприка', calories: 282, protein: 14, carbs: 54, fat: 13, category: 'other' },
+                { name: 'Кориандр', calories: 298, protein: 12, carbs: 55, fat: 18, category: 'other' },
+                { name: 'Тмин', calories: 333, protein: 20, carbs: 50, fat: 15, category: 'other' },
+                { name: 'Гвоздика', calories: 323, protein: 6, carbs: 61, fat: 20, category: 'other' },
+                { name: 'Мускатный орех', calories: 525, protein: 6, carbs: 49, fat: 36, category: 'other' },
+                { name: 'Кардамон', calories: 311, protein: 11, carbs: 68, fat: 7, category: 'other' },
+                { name: 'Лавровый лист', calories: 313, protein: 8, carbs: 75, fat: 8, category: 'other' },
+                { name: 'Шафран', calories: 310, protein: 11, carbs: 65, fat: 6, category: 'other' },
+                { name: 'Базилик сушеный', calories: 233, protein: 23, carbs: 47, fat: 4, category: 'other' },
+                { name: 'Орегано', calories: 265, protein: 9, carbs: 69, fat: 4.3, category: 'other' },
+                { name: 'Розмарин', calories: 331, protein: 4.9, carbs: 64, fat: 15, category: 'other' },
+                { name: 'Тимьян', calories: 276, protein: 9, carbs: 63, fat: 7.4, category: 'other' },
+                { name: 'Мята', calories: 70, protein: 3.8, carbs: 15, fat: 0.9, category: 'other' },
+                { name: 'Укроп сушеный', calories: 253, protein: 20, carbs: 56, fat: 4.4, category: 'other' },
+                { name: 'Петрушка сушеная', calories: 276, protein: 22, carbs: 51, fat: 4.4, category: 'other' },
+                { name: 'Чеснок сушеный', calories: 331, protein: 17, carbs: 75, fat: 0.7, category: 'other' },
+                { name: 'Лук сушеный', calories: 349, protein: 9, carbs: 83, fat: 0.5, category: 'other' },
+                { name: 'Смесь перцев', calories: 280, protein: 10, carbs: 60, fat: 5, category: 'other' },
+                { name: 'Приправа для мяса', calories: 250, protein: 8, carbs: 50, fat: 5, category: 'other' },
+                { name: 'Приправа для рыбы', calories: 240, protein: 7, carbs: 45, fat: 6, category: 'other' },
+                { name: 'Приправа для курицы', calories: 260, protein: 9, carbs: 48, fat: 5, category: 'other' },
+                { name: 'Приправа для овощей', calories: 230, protein: 6, carbs: 50, fat: 4, category: 'other' },
+                { name: 'Хмели-сунели', calories: 270, protein: 10, carbs: 55, fat: 5, category: 'other' },
+                { name: 'Карри', calories: 325, protein: 13, carbs: 58, fat: 14, category: 'other' },
+                { name: 'Аджика сухая', calories: 280, protein: 8, carbs: 50, fat: 6, category: 'other' },
+                { name: 'Бульонный кубик', calories: 180, protein: 15, carbs: 10, fat: 10, category: 'other' },
+                { name: 'Соевый соус', calories: 53, protein: 6, carbs: 5, fat: 0, category: 'other' },
+                { name: 'Вустерский соус', calories: 78, protein: 0, carbs: 19, fat: 0, category: 'other' },
+                { name: 'Табаско', calories: 12, protein: 1, carbs: 2, fat: 0, category: 'other' },
+                { name: 'Васаби', calories: 109, protein: 5, carbs: 24, fat: 0.6, category: 'other' },
+                { name: 'Мисо-паста', calories: 198, protein: 12, carbs: 26, fat: 6, category: 'other' },
+                { name: 'Тахинная паста', calories: 595, protein: 17, carbs: 21, fat: 54, category: 'other' },
+                { name: 'Ореховая паста', calories: 588, protein: 25, carbs: 20, fat: 50, category: 'other' },
+                { name: 'Томатная паста', calories: 82, protein: 4.3, carbs: 19, fat: 0.5, category: 'other' },
+                { name: 'Кунжутная паста', calories: 593, protein: 17, carbs: 12, fat: 53, category: 'other' },
+                { name: 'Хрен столовый', calories: 56, protein: 2.2, carbs: 12, fat: 0.4, category: 'other' },
+                { name: 'Горчица дижонская', calories: 143, protein: 9, carbs: 12, fat: 7, category: 'other' },
+                { name: 'Горчица русская', calories: 162, protein: 5, carbs: 12, fat: 11, category: 'other' },
+                { name: 'Горчица медовая', calories: 180, protein: 4, carbs: 20, fat: 10, category: 'other' },
+                { name: 'Соус тар-тар', calories: 380, protein: 1, carbs: 5, fat: 40, category: 'other' },
+                { name: 'Соус сырный', calories: 320, protein: 5, carbs: 10, fat: 30, category: 'other' },
+                { name: 'Соус грибной', calories: 120, protein: 2, carbs: 10, fat: 8, category: 'other' },
+                { name: 'Соус томатный', calories: 100, protein: 1.5, carbs: 20, fat: 1, category: 'other' },
+                { name: 'Соус бешамель', calories: 150, protein: 4, carbs: 10, fat: 11, category: 'other' },
+                { name: 'Соус песто', calories: 490, protein: 5, carbs: 10, fat: 50, category: 'other' },
+                { name: 'Соус сальса', calories: 36, protein: 1, carbs: 7, fat: 0.5, category: 'other' },
+                { name: 'Соус гуакамоле', calories: 160, protein: 2, carbs: 9, fat: 15, category: 'other' },
+                { name: 'Соус чимичурри', calories: 180, protein: 1, carbs: 10, fat: 16, category: 'other' },
+                { name: 'Соус хойсин', calories: 220, protein: 3, carbs: 45, fat: 2, category: 'other' },
+                { name: 'Соус унаги', calories: 230, protein: 4, carbs: 50, fat: 1, category: 'other' },
+                { name: 'Соус самбал', calories: 80, protein: 2, carbs: 15, fat: 1, category: 'other' },
+                { name: 'Соус наршараб', calories: 120, protein: 0.5, carbs: 30, fat: 0.2, category: 'other' },
+                { name: 'Соус мятный', calories: 90, protein: 1, carbs: 20, fat: 0.5, category: 'other' },
+                { name: 'Соус клюквенный', calories: 150, protein: 0.2, carbs: 38, fat: 0.1, category: 'other' },
+                { name: 'Соус брусничный', calories: 140, protein: 0.3, carbs: 35, fat: 0.2, category: 'other' },
+                { name: 'Соус яблочный', calories: 130, protein: 0.2, carbs: 32, fat: 0.1, category: 'other' },
+                { name: 'Соус апельсиновый', calories: 120, protein: 0.3, carbs: 30, fat: 0.1, category: 'other' },
+                { name: 'Соус лимонный', calories: 110, protein: 0.2, carbs: 28, fat: 0.1, category: 'other' },
+                { name: 'Соус гранатовый', calories: 160, protein: 0.5, carbs: 40, fat: 0.2, category: 'other' },
+                { name: 'Соус малиновый', calories: 170, protein: 0.5, carbs: 42, fat: 0.2, category: 'other' },
+                { name: 'Соус клубничный', calories: 165, protein: 0.4, carbs: 41, fat: 0.2, category: 'other' },
+                { name: 'Соус шоколадный', calories: 270, protein: 2, carbs: 65, fat: 2, category: 'other' },
+                { name: 'Соус карамельный', calories: 290, protein: 0, carbs: 75, fat: 0, category: 'other' },
+                { name: 'Соус ванильный', calories: 280, protein: 0, carbs: 70, fat: 0, category: 'other' },
+                { name: 'Соус кокосовый', calories: 320, protein: 2, carbs: 40, fat: 18, category: 'other' },
+                { name: 'Соус арахисовый', calories: 300, protein: 10, carbs: 30, fat: 18, category: 'other' },
+                { name: 'Соус кунжутный', calories: 290, protein: 8, carbs: 25, fat: 20, category: 'other' },
+                { name: 'Соус терияки', calories: 89, protein: 3, carbs: 16, fat: 0.9, category: 'other' },
+                { name: 'Соус барбекю', calories: 120, protein: 0.8, carbs: 25, fat: 0.5, category: 'other' },
+                { name: 'Соус чили', calories: 80, protein: 1, carbs: 18, fat: 0.5, category: 'other' },
+                { name: 'Соус цезарь', calories: 390, protein: 2, carbs: 5, fat: 40, category: 'other' },
+                { name: 'Соус тартар', calories: 380, protein: 1, carbs: 5, fat: 40, category: 'other' },
+                { name: 'Соус сырный', calories: 320, protein: 5, carbs: 10, fat: 30, category: 'other' },
+                { name: 'Соус грибной', calories: 120, protein: 2, carbs: 10, fat: 8, category: 'other' },
+                { name: 'Соус томатный', calories: 100, protein: 1.5, carbs: 20, fat: 1, category: 'other' },
+                { name: 'Соус бешамель', calories: 150, protein: 4, carbs: 10, fat: 11, category: 'other' },
+                { name: 'Соус песто', calories: 490, protein: 5, carbs: 10, fat: 50, category: 'other' },
+                { name: 'Соус сальса', calories: 36, protein: 1, carbs: 7, fat: 0.5, category: 'other' },
+                { name: 'Соус гуакамоле', calories: 160, protein: 2, carbs: 9, fat: 15, category: 'other' },
+                { name: 'Соус чимичурри', calories: 180, protein: 1, carbs: 10, fat: 16, category: 'other' },
+                { name: 'Соус хойсин', calories: 220, protein: 3, carbs: 45, fat: 2, category: 'other' },
+                { name: 'Соус унаги', calories: 230, protein: 4, carbs: 50, fat: 1, category: 'other' },
+                { name: 'Соус самбал', calories: 80, protein: 2, carbs: 15, fat: 1, category: 'other' },
+                { name: 'Соус наршараб', calories: 120, protein: 0.5, carbs: 30, fat: 0.2, category: 'other' },
+                { name: 'Соус мятный', calories: 90, protein: 1, carbs: 20, fat: 0.5, category: 'other' },
+                { name: 'Соус клюквенный', calories: 150, protein: 0.2, carbs: 38, fat: 0.1, category: 'other' },
+                { name: 'Соус брусничный', calories: 140, protein: 0.3, carbs: 35, fat: 0.2, category: 'other' },
+                { name: 'Соус яблочный', calories: 130, protein: 0.2, carbs: 32, fat: 0.1, category: 'other' },
+                { name: 'Соус апельсиновый', calories: 120, protein: 0.3, carbs: 30, fat: 0.1, category: 'other' },
+                { name: 'Соус лимонный', calories: 110, protein: 0.2, carbs: 28, fat: 0.1, category: 'other' },
+                { name: 'Соус гранатовый', calories: 160, protein: 0.5, carbs: 40, fat: 0.2, category: 'other' },
+                { name: 'Соус малиновый', calories: 170, protein: 0.5, carbs: 42, fat: 0.2, category: 'other' },
+                { name: 'Соус клубничный', calories: 165, protein: 0.4, carbs: 41, fat: 0.2, category: 'other' },
+                { name: 'Соус шоколадный', calories: 270, protein: 2, carbs: 65, fat: 2, category: 'other' },
+                { name: 'Соус карамельный', calories: 290, protein: 0, carbs: 75, fat: 0, category: 'other' },
+                { name: 'Соус ванильный', calories: 280, protein: 0, carbs: 70, fat: 0, category: 'other' },
+                { name: 'Соус кокосовый', calories: 320, protein: 2, carbs: 40, fat: 18, category: 'other' },
+                { name: 'Соус арахисовый', calories: 300, protein: 10, carbs: 30, fat: 18, category: 'other' },
+                { name: 'Соус кунжутный', calories: 290, protein: 8, carbs: 25, fat: 20, category: 'other' }
+            ];
+
+        
+
+            // Категории продуктов
+            const foodCategories = [
+                { id: 'all', name: 'Все', icon: 'fas fa-list' },
+                { id: 'meat', name: 'Мясо', icon: 'fas fa-drumstick-bite' },
+                { id: 'fish', name: 'Рыба', icon: 'fas fa-fish' },
+                { id: 'vegetables', name: 'Овощи', icon: 'fas fa-carrot' },
+                { id: 'fruits', name: 'Фрукты', icon: 'fas fa-apple-alt' },
+                { id: 'grains', name: 'Крупы', icon: 'fas fa-bread-slice' },
+                { id: 'dairy', name: 'Молочное', icon: 'fas fa-cheese' },
+                { id: 'nuts', name: 'Орехи', icon: 'fas fa-acorn' },
+                { id: 'beverages', name: 'Напитки', icon: 'fas fa-glass-whiskey' },
+                { id: 'sweets', name: 'Сладости', icon: 'fas fa-candy-cane' },
+                { id: 'fastfood', name: 'Вреднятина',icon: "fa-solid fa-burger"},
+                { id: 'other', name: 'Прочее', icon: 'fas fa-ellipsis-h' }
+            ];
+
+            // Инициализация приложения
+            function init() {
+                // Установка текущей даты
+                const now = new Date();
+                const options = { day: 'numeric', month: 'long' };
+                document.getElementById('current-date').textContent = now.toLocaleDateString('ru-RU', options);
+
+                // Загрузка данных из localStorage
+                loadData();
+
+                // Настройка навигации
+                setupNavigation();
+
+                // Настройка обработчиков событий
+                setupEventHandlers();
+
+                // Инициализация категорий
+                initCategories();
+
+                // Применение темы
+                applyTheme();
+
+                // Обновление интерфейса
+                updateUI();
+
+                // Обновление часто используемых продуктов
+                updateFrequentlyUsed();
+
+                // Определяем, какую страницу открывать
+                if (!state.hasCompletedSetup) {
+                    // Первый запуск - открываем профиль
+                    showPage('profile-page');
+                    showNotification('Заполните данные профиля и нажмите "Рассчитать"');
+                } else {
+                    // Последующие запуски - открываем дневник
+                    showPage('diary-page');
+                }
+            }
+
+            // Применение темы
+            function applyTheme() {
+                const body = document.body;
+                const themeToggle = document.getElementById('theme-toggle');
+                const themeColorMeta = document.getElementById('theme-color-meta');
+                
+                if (state.darkMode) {
+                    body.setAttribute('data-theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    themeColorMeta.setAttribute('content', '#000000');
+                } else {
+                    body.removeAttribute('data-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    themeColorMeta.setAttribute('content', '#007AFF');
+                }
+            }
+
+            // Переключение темы
+            function toggleTheme() {
+                state.darkMode = !state.darkMode;
+                applyTheme();
+                saveData();
+            }
+
+            // Функция для отображения страницы
+            function showPage(pageId) {
+                // Скрываем все страницы
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Показываем нужную страницу
+                document.getElementById(pageId).classList.add('active');
+                
+                // Обновляем навигацию
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.getAttribute('data-page') === pageId) {
+                        tab.classList.add('active');
+                    }
+                });
+                
+                // При открытии страницы поиска обновляем часто используемые
+                if (pageId === 'search-page') {
+                    updateFrequentlyUsed();
+                }
+            }
+
+            // Показ уведомления
+            function showNotification(message, duration = 3000) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, duration);
+            }
+
+            // Инициализация категорий продуктов
+            function initCategories() {
+                const container = document.getElementById('category-tabs');
+                container.innerHTML = foodCategories.map(category => 
+                    `<div class="category-tab ${category.id === 'all' ? 'active' : ''}" data-category="${category.id}">
+                        <i class="${category.icon}"></i> ${category.name}
+                    </div>`
+                ).join('');
+                
+                // Добавляем обработчики событий для категорий
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        state.currentFoodCategory = this.getAttribute('data-category');
+                        
+                        // Если выбран не "Все", показываем продукты категории
+                        if (state.currentFoodCategory !== 'all') {
+                            showCategoryProducts(state.currentFoodCategory);
+                        } else {
+                            // Очищаем результаты категорий и показываем стандартное сообщение
+                            document.getElementById('category-results').innerHTML = '';
+                            document.getElementById('search-results').innerHTML = '<li class="empty-state">Начните поиск продуктов или выберите категорию</li>';
+                            updateFrequentlyUsed();
+                        }
+                    });
+                });
+            }
+
+            // Показ продуктов по категории
+            function showCategoryProducts(categoryId) {
+                const categoryResults = document.getElementById('category-results');
+                const searchResults = document.getElementById('search-results');
+                const frequentlyUsedCard = document.getElementById('frequently-used-card');
+                
+                // Очищаем результаты поиска
+                searchResults.innerHTML = '';
+                
+                // Скрываем часто используемые при выборе категории
+                frequentlyUsedCard.style.display = 'none';
+                
+                // Получаем продукты выбранной категории
+                const categoryProducts = foodDatabase.filter(food => food.category === categoryId);
+                
+                if (categoryProducts.length === 0) {
+                    categoryResults.innerHTML = '<div class="empty-state">В этой категории пока нет продуктов</div>';
+                    return;
+                }
+                
+                // Получаем информацию о категории
+                const categoryInfo = foodCategories.find(c => c.id === categoryId);
+                
+                // Создаем красивый заголовок категории
+                categoryResults.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="${categoryInfo.icon}"></i>
+                        </div>
+                        <h3 class="category-title">${categoryInfo.name}</h3>
+                    </div>
+                    <div class="category-products">
+                        ${categoryProducts.map(product => `
+                            <div class="product-card" data-food='${JSON.stringify(product)}'>
+                                <div class="product-info">
+                                    <div class="food-name">${product.name}</div>
+                                    <div class="product-macros">
+                                        <span class="macro-badge macro-protein">Б: ${product.protein}г</span>
+                                        <span class="macro-badge macro-carbs">У: ${product.carbs}г</span>
+                                        <span class="macro-badge macro-fat">Ж: ${product.fat}г</span>
+                                    </div>
+                                </div>
+                                <div class="product-calories">${product.calories} ккал</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Добавляем обработчики для выбора продукта
+                document.querySelectorAll('.product-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        const foodData = JSON.parse(this.getAttribute('data-food'));
+                        document.getElementById('food-name').value = foodData.name;
+                        closeModal();
+                        openAddFoodModal();
+                    });
+                });
+            }
+
+            // Обновление списка часто используемых продуктов
+            function updateFrequentlyUsed() {
+                const commonFoodsContainer = document.getElementById('common-foods');
+                const frequentlyUsedCard = document.getElementById('frequently-used-card');
+                
+                // Если нет часто используемых продуктов
+                if (Object.keys(state.frequentlyUsed).length === 0) {
+                    commonFoodsContainer.innerHTML = '<li class="empty-state">Добавляйте продукты, чтобы они появились здесь</li>';
+                    return;
+                }
+                
+                // Сортируем продукты по частоте использования
+                const sortedFoods = Object.entries(state.frequentlyUsed)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5); // Берем топ-5
+                
+                // Получаем полную информацию о продуктах
+                const frequentlyUsedFoods = sortedFoods.map(([name, count]) => {
+                    return foodDatabase.find(food => food.name === name);
+                }).filter(Boolean); // Фильтруем undefined значения
+                
+                // Если нет результатов поиска и выбрана категория "Все", показываем часто используемые
+                const searchQuery = document.getElementById('food-search').value;
+                if (searchQuery.length === 0 && state.currentFoodCategory === 'all') {
+                    frequentlyUsedCard.style.display = 'block';
+                    commonFoodsContainer.innerHTML = frequentlyUsedFoods.map(food => `
+                        <li class="food-item" data-food='${JSON.stringify(food)}'>
+                            <div>
+                                <div class="food-name">${food.name}</div>
+                                <div class="food-details">100г • ${food.calories} ккал • Б:${food.protein}г, У:${food.carbs}г, Ж:${food.fat}г</div>
+                            </div>
+                            <div class="food-calories">${food.calories}</div>
+                        </li>
+                    `).join('');
+                    
+                    // Добавляем обработчики для выбора продукта
+                    document.querySelectorAll('#common-foods .food-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            const foodData = JSON.parse(this.getAttribute('data-food'));
+                            document.getElementById('food-name').value = foodData.name;
+                            closeModal();
+                            openAddFoodModal();
+                        });
+                    });
+                } else {
+                    frequentlyUsedCard.style.display = 'none';
+                }
+            }
+
+            // Загрузка данных из localStorage
+            function loadData() {
+                const savedData = localStorage.getItem('nutrilifeData');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    state = {...state, ...parsedData};
+                }
+            }
+
+            // Сохранение данных в localStorage
+            function saveData() {
+                localStorage.setItem('nutrilifeData', JSON.stringify(state));
+            }
+
+            // Настройка навигации
+            function setupNavigation() {
+                const tabs = document.querySelectorAll('.nav-tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const pageId = this.getAttribute('data-page');
+                        showPage(pageId);
+                    });
+                });
+            }
+
+            // Настройка обработчиков событий
+            function setupEventHandlers() {
+                // Кнопка добавления пищи
+                document.getElementById('add-food-btn').addEventListener('click', openAddFoodModal);
+                
+                // Выбор категории приема пищи
+                document.querySelectorAll('.meal-category').forEach(category => {
+                    category.addEventListener('click', function() {
+                        document.querySelectorAll('.meal-category').forEach(c => c.classList.remove('active'));
+                        this.classList.add('active');
+                        state.selectedMeal = this.getAttribute('data-meal');
+                    });
+                });
+                
+                // Сохранение профиля
+                document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+                
+                // Расчет целей
+                document.getElementById('calculate-goals-btn').addEventListener('click', calculateGoalsFromForm);
+                
+                // Добавление воды
+                document.getElementById('add-water-btn').addEventListener('click', addWater);
+                
+                // Модальное окно
+                document.querySelector('.modal-close').addEventListener('click', closeModal);
+                document.getElementById('save-food-btn').addEventListener('click', saveFood);
+                
+                // Поиск продуктов
+                document.getElementById('food-search').addEventListener('input', searchFoods);
+                
+                // Переключение темы
+                document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+                
+                // Автодополнение при вводе названия продукта
+                document.getElementById('food-name').addEventListener('input', showFoodSuggestions);
+                
+                // Закрытие автодополнения при клике вне его
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.autocomplete-container')) {
+                        hideFoodSuggestions();
+                    }
+                });
+            }
+
+            // Расчет целей на основе данных формы
+            function calculateGoalsFromForm() {
+                // Получаем значения из формы
+                const weight = parseInt(document.getElementById('user-weight').value);
+                const height = parseInt(document.getElementById('user-height').value);
+                const age = parseInt(document.getElementById('user-age').value);
+                const gender = document.getElementById('user-gender').value;
+                const activity = document.getElementById('user-activity').value;
+                const goal = document.getElementById('user-goal').value;
+                
+                if (!weight || !height || !age) {
+                    showNotification('Пожалуйста, заполните все поля: вес, рост и возраст');
+                    return;
+                }
+                
+                // Сохранение данных профиля
+                state.profile.weight = weight;
+                state.profile.height = height;
+                state.profile.age = age;
+                state.profile.gender = gender;
+                state.profile.activity = activity;
+                state.profile.goal = goal;
+                
+                // Расчет целей
+                calculateGoals();
+                
+                // Обновление интерфейса
+                updateUI();
+                
+                // Показываем уведомление об успехе
+                showNotification('Норма калорий рассчитана успешно!');
+                
+                // Помечаем, что настройка завершена
+                state.hasCompletedSetup = true;
+                saveData();
+                
+                // Переходим на страницу дневника
+                showPage('diary-page');
+            }
+
+            // Открытие модального окна добавления пищи
+            function openAddFoodModal() {
+                // Проверяем, заполнен ли профиль
+                if (!state.hasCompletedSetup) {
+                    showNotification('Сначала заполните данные профиля и рассчитайте норму калорий');
+                    
+                    // Переключаемся на страницу профиля
+                    showPage('profile-page');
+                    return;
+                }
+                
+                document.getElementById('add-food-modal').classList.add('active');
+                document.getElementById('food-name').focus();
+            }
+
+            // Закрытие модального окна
+            function closeModal() {
+                document.getElementById('add-food-modal').classList.remove('active');
+                hideFoodSuggestions();
+            }
+
+            // Показать подсказки для автодополнения
+            function showFoodSuggestions() {
+                const input = document.getElementById('food-name');
+                const suggestionsContainer = document.getElementById('food-suggestions');
+                const query = input.value.toLowerCase().trim();
+                
+                // Скрываем предупреждение о фастфуде
+                document.getElementById('fastfood-warning').style.display = 'none';
+                
+                if (query.length < 2) {
+                    hideFoodSuggestions();
+                    return;
+                }
+                
+                // Фильтруем продукты по запросу
+                const filteredFoods = foodDatabase.filter(food => 
+                    food.name.toLowerCase().includes(query)
+                ).slice(0, 5); // Ограничиваем количество подсказок
+                
+                if (filteredFoods.length === 0) {
+                    hideFoodSuggestions();
+                    return;
+                }
+                
+                // Отображаем подсказки
+                suggestionsContainer.innerHTML = filteredFoods.map(food => `
+                    <div class="autocomplete-suggestion" data-name="${food.name}" data-category="${food.category}">
+                        ${food.name}
+                    </div>
+                `).join('');
+                
+                suggestionsContainer.style.display = 'block';
+                
+                // Добавляем обработчики для выбора подсказки
+                document.querySelectorAll('.autocomplete-suggestion').forEach(suggestion => {
+                    suggestion.addEventListener('click', function() {
+                        input.value = this.getAttribute('data-name');
+                        hideFoodSuggestions();
+                        
+                        // Показываем предупреждение, если это фастфуд
+                        if (this.getAttribute('data-category') === 'fastfood') {
+                            document.getElementById('fastfood-warning').style.display = 'block';
+                        }
+                    });
+                });
+            }
+
+            // Скрыть подсказки автодополнения
+            function hideFoodSuggestions() {
+                document.getElementById('food-suggestions').style.display = 'none';
+            }
+
+            // Сохранение добавленной пищи
+            function saveFood() {
+                const name = document.getElementById('food-name').value;
+                const amount = parseInt(document.getElementById('food-amount').value);
+                const meal = state.selectedMeal;
+                
+                if (!name || !amount) {
+                    showNotification('Пожалуйста, заполните все поля');
+                    return;
+                }
+                
+                // Поиск продукта в базе
+                const foodItem = foodDatabase.find(item => 
+                    item.name.toLowerCase().includes(name.toLowerCase())
+                );
+                
+                if (!foodItem) {
+                    showNotification('Продукт не найден в базе данных. Пожалуйста, выберите другой продукт.');
+                    return;
+                }
+                
+                // Обновляем счетчик часто используемых продуктов
+                if (state.frequentlyUsed[foodItem.name]) {
+                    state.frequentlyUsed[foodItem.name] += 1;
+                } else {
+                    state.frequentlyUsed[foodItem.name] = 1;
+                }
+                
+                // Расчет питательных веществ на основе количества
+                const ratio = amount / 100;
+                const calories = Math.round(foodItem.calories * ratio);
+                const protein = Math.round(foodItem.protein * ratio);
+                const carbs = Math.round(foodItem.carbs * ratio);
+                const fat = Math.round(foodItem.fat * ratio);
+                
+                // Добавление пищи в дневник
+                state.diary.foods.push({
+                    id: Date.now(), // уникальный идентификатор для возможности удаления
+                    name: foodItem.name,
+                    amount,
+                    meal,
+                    calories,
+                    protein,
+                    carbs,
+                    fat,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Показываем специальное уведомление для фастфуда
+                if (foodItem.category === 'fastfood') {
+                    showNotification('Зачем ты это сделал? Фастфуд вредит твоему здоровью! Больше так не делай!', 5000);
+                }
+                
+                // Обновление статистики
+                updateNutritionData();
+                
+                // Закрытие модального окна и обновление интерфейса
+                closeModal();
+                updateUI();
+                saveData();
+                
+                // Сброс полей формы
+                document.getElementById('food-name').value = '';
+                document.getElementById('food-amount').value = '';
+                document.getElementById('fastfood-warning').style.display = 'none';
+            }
+
+            // Поиск продуктов
+            function searchFoods() {
+                const query = document.getElementById('food-search').value.toLowerCase();
+                const resultsContainer = document.getElementById('search-results');
+                const categoryResults = document.getElementById('category-results');
+                const frequentlyUsedCard = document.getElementById('frequently-used-card');
+                
+                // Если есть поисковый запрос, очищаем результаты категорий
+                if (query.length > 0) {
+                    categoryResults.innerHTML = '';
+                    frequentlyUsedCard.style.display = 'none';
+                } else if (state.currentFoodCategory !== 'all') {
+                    // Если запроса нет и выбрана категория, показываем продукты категории
+                    showCategoryProducts(state.currentFoodCategory);
+                    return;
+                } else {
+                    // Если запроса нет и выбрана категория "Все", показываем часто используемые
+                    updateFrequentlyUsed();
+                    return;
+                }
+                
+                if (query.length < 1) {
+                    resultsContainer.innerHTML = '<li class="empty-state">Введите название продукта для поиска</li>';
+                    return;
+                }
+                
+                let filteredFoods = foodDatabase.filter(food => 
+                    food.name.toLowerCase().includes(query)
+                );
+                
+                // Фильтрация по категории
+                if (state.currentFoodCategory !== 'all') {
+                    filteredFoods = filteredFoods.filter(food => 
+                        food.category === state.currentFoodCategory
+                    );
+                }
+                
+                if (filteredFoods.length === 0) {
+                    resultsContainer.innerHTML = '<li class="empty-state">Ничего не найдено</li>';
+                    return;
+                }
+                
+                resultsContainer.innerHTML = filteredFoods.map(food => `
+                    <li class="food-item" data-food='${JSON.stringify(food)}'>
+                        <div>
+                            <div class="food-name">${food.name}</div>
+                            <div class="food-details">100г • ${food.calories} ккал • Б:${food.protein}г, У:${food.carbs}г, Ж:${food.fat}г</div>
+                        </div>
+                        <div class="food-calories">${food.calories}</div>
+                    </li>
+                `).join('');
+                
+                // Добавляем обработчики для выбора продукта
+                document.querySelectorAll('#search-results .food-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const foodData = JSON.parse(this.getAttribute('data-food'));
+                        document.getElementById('food-name').value = foodData.name;
+                        closeModal();
+                        openAddFoodModal();
+                    });
+                });
+            }
+
+            // Добавление воды
+            function addWater() {
+                // Проверяем, заполнен ли профиль
+                if (!state.hasCompletedSetup) {
+                    showNotification('Сначала заполните данные профиля и рассчитайте норму калорий');
+                    
+                    // Переключаемся на страницу профиля
+                    showPage('profile-page');
+                    return;
+                }
+                
+                state.diary.water.push({
+                    id: Date.now(), // уникальный идентификатор для возможности удаления
+                    amount: 250, // мл в стакане
+                    timestamp: new Date().toISOString()
+                });
+                
+                updateUI();
+                saveData();
+                
+                // Анимация добавления
+                const waterCount = document.getElementById('water-consumed');
+                waterCount.classList.add('pulse');
+                setTimeout(() => waterCount.classList.remove('pulse'), 600);
+                
+                // Проверка достижения цели по воде
+                if (state.diary.water.length >= state.waterGoal) {
+                    showConfetti();
+                }
+            }
+
+            // Удаление записи о воде
+            function deleteWater(id) {
+                const waterItem = document.querySelector(`.water-item[data-id="${id}"]`);
+                if (waterItem) {
+                    waterItem.classList.add('removing');
+                    setTimeout(() => {
+                        state.diary.water = state.diary.water.filter(item => item.id !== id);
+                        updateUI();
+                        saveData();
+                    }, 400);
+                }
+            }
+
+            // Удаление записи о еде
+            function deleteFood(id) {
+                const foodItem = document.querySelector(`.food-item[data-id="${id}"]`);
+                if (foodItem) {
+                    foodItem.classList.add('removing');
+                    setTimeout(() => {
+                        state.diary.foods = state.diary.foods.filter(item => item.id !== id);
+                        updateNutritionData();
+                        updateUI();
+                        saveData();
+                    }, 400);
+                }
+            }
+
+            // Эффект конфетти при достижении цели
+            function showConfetti() {
+                const colors = ['#007AFF', '#5856D6', '#34C759', '#FF9500', '#FF3B30'];
+                
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.style.animation = 'confettiFall 2s ease forwards';
+                    }, 10);
+                    
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.parentNode.removeChild(confetti);
+                        }
+                    }, 3000);
+                }
+            }
+
+            // Сохранение профиля
+            function saveProfile() {
+                state.profile.weight = parseInt(document.getElementById('user-weight').value) || state.profile.weight;
+                state.profile.height = parseInt(document.getElementById('user-height').value) || state.profile.height;
+                state.profile.age = parseInt(document.getElementById('user-age').value) || state.profile.age;
+                state.profile.gender = document.getElementById('user-gender').value;
+                state.profile.goal = document.getElementById('user-goal').value;
+                state.profile.activity = document.getElementById('user-activity').value;
+                
+                // Обновление целевых калорий, если пользователь изменил их вручную
+                const calorieTarget = parseInt(document.getElementById('calorie-target').value);
+                if (calorieTarget && calorieTarget > 0) {
+                    state.profile.calorieGoal = calorieTarget;
+                }
+                
+                updateUI();
+                saveData();
+                
+                // Показываем подтверждение
+                showNotification('Данные сохранены!');
+            }
+
+            // Расчет целей по калориям и макронутриентам
+            function calculateGoals() {
+                // Формула Миффлина-Сан Жеора для расчета базового метаболизма
+                let bmr;
+                if (state.profile.gender === 'male') {
+                    bmr = 10 * state.profile.weight + 6.25 * state.profile.height - 5 * state.profile.age + 5;
+                } else {
+                    bmr = 10 * state.profile.weight + 6.25 * state.profile.height - 5 * state.profile.age - 161;
+                }
+                
+                // Учет уровня активности
+                const activityMultipliers = {
+                    sedentary: 1.2,
+                    light: 1.375,
+                    moderate: 1.55,
+                    active: 1.725
+                };
+                
+                let calorieGoal = Math.round(bmr * activityMultipliers[state.profile.activity]);
+                
+                // Учет цели
+                if (state.profile.goal === 'lose') {
+                    calorieGoal -= 500;
+                } else if (state.profile.goal === 'gain') {
+                    calorieGoal += 500;
+                }
+                
+                // Установка целей по макронутриентам (стандартное соотношение)
+                state.profile.calorieGoal = calorieGoal;
+                state.profile.proteinGoal = Math.round(state.profile.weight * 2); // 2г белка на кг веса
+                state.profile.carbsGoal = Math.round((calorieGoal * 0.5) / 4); // 50% от калорий, 1г углеводов = 4 ккал
+                state.profile.fatGoal = Math.round((calorieGoal * 0.3) / 9); // 30% от калорий, 1г жиров = 9 ккал
+            }
+
+            // Обновление данных о питании
+            function updateNutritionData() {
+                // Сброс показателей
+                state.diary.consumedCalories = 0;
+                state.diary.consumedProtein = 0;
+                state.diary.consumedCarbs = 0;
+                state.diary.consumedFat = 0;
+                
+                // Суммирование потребленных питательных веществ
+                state.diary.foods.forEach(food => {
+                    state.diary.consumedCalories += food.calories;
+                    state.diary.consumedProtein += food.protein;
+                    state.diary.consumedCarbs += food.carbs;
+                    state.diary.consumedFat += food.fat;
+                });
+            }
+
+            // Обновление интерфейса
+            function updateUI() {
+                // Обновление кольца прогресса калорий
+                const caloriesProgress = Math.min(state.diary.consumedCalories / state.profile.calorieGoal, 1);
+                const circumference = 2 * Math.PI * 45;
+                const offset = circumference - (caloriesProgress * circumference);
+                
+                document.querySelector('.ring-progress').style.strokeDasharray = circumference;
+                document.querySelector('.ring-progress').style.strokeDashoffset = offset;
+                
+                document.getElementById('consumed-calories').textContent = state.diary.consumedCalories;
+                document.getElementById('calorie-goal').textContent = state.profile.calorieGoal;
+                
+                // Обновление макронутриентов
+                document.getElementById('protein-value').textContent = `${state.diary.consumedProtein}г`;
+                document.getElementById('carbs-value').textContent = `${state.diary.consumedCarbs}г`;
+                document.getElementById('fat-value').textContent = `${state.diary.consumedFat}г`;
+                
+                document.querySelector('.protein').style.width = `${Math.min(state.diary.consumedProtein / state.profile.proteinGoal, 1) * 100}%`;
+                document.querySelector('.carbs').style.width = `${Math.min(state.diary.consumedCarbs / state.profile.carbsGoal, 1) * 100}%`;
+                document.querySelector('.fat').style.width = `${Math.min(state.diary.consumedFat / state.profile.fatGoal, 1) * 100}%`;
+                
+                // Обновление списка пищи
+                const foodList = document.getElementById('today-food-list');
+                if (state.diary.foods.length === 0) {
+                    foodList.innerHTML = '<li class="empty-state">Добавьте продукты, чтобы начать отслеживание</li>';
+                } else {
+                    foodList.innerHTML = state.diary.foods.map(food => `
+                        <li class="food-item" data-id="${food.id}">
+                            <div class="item-with-delete">
+                                <div>
+                                    <div class="food-name">${food.name}</div>
+                                    <div class="food-details">${food.amount}г • ${food.meal === 'breakfast' ? 'Завтрак' : 
+                                        food.meal === 'lunch' ? 'Обед' : 
+                                        food.meal === 'dinner' ? 'Ужин' : 'Перекус'}</div>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="food-calories">${food.calories}</div>
+                                    <button class="delete-btn" onclick="deleteFood(${food.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+                
+                // Обновление данных о воде
+                const waterConsumed = state.diary.water.length;
+                document.getElementById('water-consumed').textContent = waterConsumed;
+                document.getElementById('water-goal').textContent = state.waterGoal;
+                
+                const waterHistory = document.getElementById('water-history');
+                if (waterConsumed === 0) {
+                    waterHistory.innerHTML = '<li class="empty-state">Вода будет отображаться здесь</li>';
+                } else {
+                    waterHistory.innerHTML = state.diary.water.map(entry => {
+                        const date = new Date(entry.timestamp);
+                        return `
+                            <li class="food-item water-item" data-id="${entry.id}">
+                                <div class="item-with-delete">
+                                    <div>
+                                        <div class="food-name">Стакан воды</div>
+                                        <div class="food-details">${date.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <div class="food-calories">250 мл</div>
+                                        <button class="delete-btn" onclick="deleteWater(${entry.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                    }).join('');
+                }
+                
+                // Обновление данных профиля
+                document.getElementById('user-weight').value = state.profile.weight || '';
+                document.getElementById('user-height').value = state.profile.height || '';
+                document.getElementById('user-age').value = state.profile.age || '';
+                document.getElementById('user-gender').value = state.profile.gender;
+                document.getElementById('user-goal').value = state.profile.goal;
+                document.getElementById('user-activity').value = state.profile.activity;
+                document.getElementById('calorie-target').value = state.profile.calorieGoal;
+                
+                document.getElementById('profile-calories').textContent = state.profile.calorieGoal || '-';
+                document.getElementById('profile-protein').textContent = state.profile.proteinGoal ? `${state.profile.proteinGoal}г` : '-';
+                document.getElementById('profile-carbs').textContent = state.profile.carbsGoal ? `${state.profile.carbsGoal}г` : '-';
+                document.getElementById('profile-fat').textContent = state.profile.fatGoal ? `${state.profile.fatGoal}г` : '-';
+            }
+
+            // Запуск приложения после загрузки DOM
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            // Делаем функции удаления глобальными для обработки событий onclick
+            window.deleteWater = deleteWater;
+            window.deleteFood = deleteFood;
+
+        })();
+    </script>
+</body>
+</html>
